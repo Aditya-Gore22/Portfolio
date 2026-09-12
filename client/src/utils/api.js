@@ -1,12 +1,35 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+export const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/$/, '');
+  }
+  if (typeof window !== 'undefined' && window.__API_URL__) {
+    return String(window.__API_URL__).replace(/\/$/, '');
+  }
+  if (typeof localStorage !== 'undefined') {
+    const saved = localStorage.getItem('portfolio_api_base_url');
+    if (saved) return saved.replace(/\/$/, '');
+  }
+  return '';
+};
+
+export const setApiBaseUrl = (url) => {
+  if (typeof localStorage !== 'undefined') {
+    if (url) {
+      localStorage.setItem('portfolio_api_base_url', url.trim().replace(/\/$/, ''));
+    } else {
+      localStorage.removeItem('portfolio_api_base_url');
+    }
+  }
+};
 
 export const apiUrl = (endpoint) => {
   if (!endpoint) return '';
   if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
     return endpoint;
   }
+  const base = getApiBaseUrl();
   const clean = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  return `${API_BASE_URL}${clean}`;
+  return `${base}${clean}`;
 };
 
 /**
@@ -31,8 +54,9 @@ export const resolveImageUrl = (imagePath) => {
 
   // Dynamic uploads from backend (/uploads/...)
   if (imagePath.startsWith('/uploads/')) {
-    if (API_BASE_URL) {
-      return `${API_BASE_URL}${imagePath}`;
+    const base = getApiBaseUrl();
+    if (base) {
+      return `${base}${imagePath}`;
     }
   }
 

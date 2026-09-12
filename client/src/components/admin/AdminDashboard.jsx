@@ -38,7 +38,7 @@ import {
 } from 'react-icons/fa';
 import { MdDashboard, MdOutlineMarkEmailRead } from 'react-icons/md';
 import { useSettings } from '../../context/SettingsContext.jsx';
-import { apiUrl, resolveImageUrl } from '../../utils/api';
+import { apiUrl, resolveImageUrl, getApiBaseUrl, setApiBaseUrl } from '../../utils/api';
 
 const AdminDashboard = ({ onNavigate }) => {
   const { updateSettings: updateContextSettings, refreshSettings } = useSettings();
@@ -583,7 +583,23 @@ const AdminDashboard = ({ onNavigate }) => {
         });
       }
 
-      const json = await res.json();
+      const text = await res.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (parseErr) {
+        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+          if (res.status === 413) {
+            alert('Image size is too large for the server. Please select a smaller photo.');
+            return;
+          }
+          alert('API connection error: The request reached Vercel instead of your Render backend.\n\nTo fix:\n1. Make sure your Render backend URL is added as VITE_API_URL in Vercel settings and redeploy.\n2. Or enter your Render URL in Admin -> Settings -> Backend API URL.');
+          return;
+        }
+        alert('Server returned invalid response: ' + text.slice(0, 150));
+        return;
+      }
+
       if (json.success) {
         setIsAddProjectModalOpen(false);
         loadDashboardData();
@@ -2354,6 +2370,20 @@ const AdminDashboard = ({ onNavigate }) => {
                     onChange={(e) => setSettings({ ...settings, portfolio_url: e.target.value })}
                     placeholder="https://adityagore.dev"
                   />
+                </div>
+
+                <div className="settings-field">
+                  <label>Backend API URL (Render / Cloud Backend)</label>
+                  <input 
+                    type="url" 
+                    className="admin-input"
+                    defaultValue={getApiBaseUrl()}
+                    onChange={(e) => setApiBaseUrl(e.target.value)}
+                    placeholder="https://aditya-portfolio-api.onrender.com"
+                  />
+                  <span style={{ fontSize: '11px', color: 'var(--admin-text-secondary, #94a3b8)', marginTop: '4px', display: 'block' }}>
+                    Connects directly to your Render backend without having to rebuild on Vercel.
+                  </span>
                 </div>
 
                 <div className="settings-field">
