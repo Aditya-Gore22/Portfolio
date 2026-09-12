@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ProjectDetailPage.css';
-import { apiUrl } from '../utils/api';
+import { apiUrl, resolveImageUrl } from '../utils/api';
 import { 
   SiReact, 
   SiNodedotjs, 
@@ -252,7 +252,7 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
           <div className="project-gallery-col">
             <div className="main-preview-frame">
               <img 
-                src={activeImage || project.image} 
+                src={resolveImageUrl(activeImage || project.image)} 
                 alt={project.title} 
                 className="main-preview-img" 
               />
@@ -271,7 +271,7 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
                       title={item.title || `Thumbnail ${index + 1}`}
                     >
                       <img 
-                        src={item.thumb || item.full} 
+                        src={resolveImageUrl(item.thumb || item.full)} 
                         alt={item.title || `Thumbnail ${index + 1}`} 
                         className="thumb-img" 
                       />
