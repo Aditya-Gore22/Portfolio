@@ -24,7 +24,7 @@ export const setApiBaseUrl = (url) => {
 
 export const apiUrl = (endpoint) => {
   if (!endpoint) return '';
-  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://') || endpoint.startsWith('data:')) {
     return endpoint;
   }
   const base = getApiBaseUrl();
@@ -34,7 +34,7 @@ export const apiUrl = (endpoint) => {
 
 /**
  * Resolves an image URL so it works seamlessly on Vercel, Render, or localhost.
- * - Handles data: URLs (Base64)
+ * - Handles data: URLs (Base64) with auto-healing
  * - Handles full external URLs (http/https)
  * - Handles static /images/... paths bundled with client
  * - Handles /uploads/... from the Render backend
@@ -42,8 +42,21 @@ export const apiUrl = (endpoint) => {
 export const resolveImageUrl = (imagePath) => {
   if (!imagePath) return '/images/02_construction_project.png';
 
-  // Data URLs (Base64) or external URLs (Imgur, Cloudinary, etc.)
-  if (imagePath.startsWith('data:') || imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+  // Handle data URLs or accidentally mangled data URLs
+  if (imagePath.startsWith('data:') || imagePath.includes(';base64,') || imagePath.startsWith('/data') || imagePath.startsWith('/64,')) {
+    if (imagePath.startsWith('data:')) return imagePath;
+    if (imagePath.includes('data:image/')) {
+      return imagePath.substring(imagePath.indexOf('data:image/'));
+    }
+    if (imagePath.includes(',')) {
+      const payload = imagePath.substring(imagePath.indexOf(',') + 1);
+      return `data:image/webp;base64,${payload}`;
+    }
+    return imagePath;
+  }
+
+  // External full URLs (Imgur, Cloudinary, etc.)
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
     return imagePath;
   }
 
