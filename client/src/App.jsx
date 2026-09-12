@@ -5,16 +5,19 @@ import FeaturedProjects from './components/FeaturedProjects';
 import AboutSkillsAchievements from './components/AboutSkillsAchievements';
 import ContactCTA from './components/ContactCTA';
 import ContactPage from './components/ContactPage';
+import ResumePage from './components/ResumePage';
 import ProjectDetailPage from './components/ProjectDetailPage';
 import TakeABreakGame from './components/TakeABreakGame';
 import AdminDashboard from './components/admin/AdminDashboard';
 import Footer from './components/Footer';
+import { apiUrl } from './utils/api';
 
 function App() {
   const [currentView, setCurrentView] = useState(() => {
     const hash = window.location.hash;
     if (hash === '#admin') return 'admin';
     if (hash === '#contact') return 'contact';
+    if (hash === '#resume') return 'resume';
     if (hash === '#game' || hash === '#take-a-break') return 'game';
     if (hash.startsWith('#project/')) return 'project-detail';
     return 'home';
@@ -37,6 +40,9 @@ function App() {
       } else if (hash === '#contact') {
         setCurrentView('contact');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (hash === '#resume') {
+        setCurrentView('resume');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (hash === '#game' || hash === '#take-a-break') {
         setCurrentView('game');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -53,7 +59,7 @@ function App() {
     window.addEventListener('hashchange', handleHashChange);
     
     // Dynamic visit tracking in MySQL
-    fetch('/api/track-visit', { method: 'POST' }).catch(() => {});
+    fetch(apiUrl('/api/track-visit'), { method: 'POST' }).catch(() => {});
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
@@ -66,6 +72,10 @@ function App() {
     } else if (view === 'contact') {
       setCurrentView('contact');
       window.location.hash = 'contact';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (view === 'resume') {
+      setCurrentView('resume');
+      window.location.hash = 'resume';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (view === 'game') {
       setCurrentView('game');
@@ -116,6 +126,10 @@ function App() {
       {currentView === 'contact' ? (
         <main>
           <ContactPage onNavigate={handleNavigate} />
+        </main>
+      ) : currentView === 'resume' ? (
+        <main>
+          <ResumePage onNavigate={handleNavigate} />
         </main>
       ) : currentView === 'game' ? (
         <main>

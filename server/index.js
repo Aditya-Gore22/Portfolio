@@ -21,8 +21,7 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 }
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || 'aditya_portfolio_jwt_secret_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_jwt_secret_key_change_in_production';
 
 app.use(cors());
 app.use(express.json());
@@ -53,6 +52,31 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new Error('Only image files are allowed.'));
+    }
+  }
+});
+
+// Dedicated resume multer storage for PDF files
+const resumeStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOADS_DIR);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const cleanName = path.parse(file.originalname).name.replace(/[^a-zA-Z0-9_-]/g, '_');
+    cb(null, `${cleanName}_${Date.now()}${ext}`);
+  }
+});
+
+const uploadResume = multer({
+  storage: resumeStorage,
+  limits: { fileSize: 30 * 1024 * 1024 }, // 30MB limit
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (file.mimetype === 'application/pdf' || ext === '.pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF documents are allowed for resume upload.'));
     }
   }
 });
@@ -91,6 +115,26 @@ function parseJsonField(val, fallback = []) {
   } catch (e) {
     return fallback;
   }
+}
+
+// Helper to safely serialize values to JSON strings for MySQL JSON columns
+// Prevents mysql2 from interpreting nested JavaScript arrays as comma-separated SQL arguments
+function stringifyJsonField(val, fallback = []) {
+  if (val !== undefined && val !== null) {
+    if (typeof val === 'string') {
+      try {
+        JSON.parse(val);
+        return val;
+      } catch (e) {
+        return JSON.stringify([val]);
+      }
+    }
+    return JSON.stringify(val);
+  }
+  if (fallback !== undefined && fallback !== null) {
+    return typeof fallback === 'string' ? fallback : JSON.stringify(fallback);
+  }
+  return JSON.stringify([]);
 }
 
 // Format project row to clean JSON object
@@ -199,8 +243,8 @@ app.get('/api/auth/me', requireAuth, async (req, res) => {
 
     const user = {
       ...rows[0],
-      linkedin_url: settingsMap.linkedin_url || 'https://www.linkedin.com/in/aditya-gore-b37233266/',
-      github_url: settingsMap.github_url || 'https://github.com/Aditya-Gore22'
+      linkedin_url: settingsMap.linkedin_url || process.env.LINKEDIN_URL || '',
+      github_url: settingsMap.github_url || process.env.GITHUB_URL || ''
     };
 
     return res.status(200).json({ success: true, user });
@@ -461,10 +505,10 @@ app.post('/api/projects', requireAuth, async (req, res) => {
         fullDescription || shortDescription || '',
         image || '/images/02_construction_project.png',
         category || 'Full Stack',
-        JSON.stringify(tags || ['React', 'Node.js']),
-        JSON.stringify(gallery || []),
-        JSON.stringify(features || []),
-        JSON.stringify(techStack || []),
+        stringifyJsonField(tags, ['React', 'Node.js']),
+        stringifyJsonField(gallery, []),
+        stringifyJsonField(features, []),
+        stringifyJsonField(techStack, []),
         liveDemoUrl || '',
         githubUrl || '',
         published !== undefined ? (published ? 1 : 0) : 1,
@@ -481,7 +525,7 @@ app.post('/api/projects', requireAuth, async (req, res) => {
     });
   } catch (err) {
     console.error('Error creating project:', err);
-    return res.status(500).json({ success: false, error: err.message });
+    return res.status(500).json({ success: false, message: err.message, error: err.message });
   }
 });
 
@@ -539,10 +583,10 @@ app.put('/api/projects/:id', requireAuth, async (req, res) => {
         fullDescription !== undefined ? fullDescription : current.fullDescription,
         image !== undefined ? image : current.image,
         category !== undefined ? category : current.category,
-        tags !== undefined ? JSON.stringify(tags) : current.tags,
-        gallery !== undefined ? JSON.stringify(gallery) : current.gallery,
-        features !== undefined ? JSON.stringify(features) : current.features,
-        techStack !== undefined ? JSON.stringify(techStack) : current.techStack,
+        stringifyJsonField(tags, current.tags),
+        stringifyJsonField(gallery, current.gallery),
+        stringifyJsonField(features, current.features),
+        stringifyJsonField(techStack, current.techStack),
         liveDemoUrl !== undefined ? liveDemoUrl : current.liveDemoUrl,
         githubUrl !== undefined ? githubUrl : current.githubUrl,
         published !== undefined ? (published ? 1 : 0) : current.published,
@@ -560,7 +604,7 @@ app.put('/api/projects/:id', requireAuth, async (req, res) => {
     });
   } catch (err) {
     console.error('Error updating project:', err);
-    return res.status(500).json({ success: false, error: err.message });
+    return res.status(500).json({ success: false, message: err.message, error: err.message });
   }
 });
 
@@ -921,14 +965,19 @@ app.get('/api/settings', async (req, res) => {
     const pool = getPool();
     const [rows] = await pool.query('SELECT * FROM site_settings');
     const defaultSettings = {
-      site_title: 'Aditya Gore | Full Stack Developer Portfolio',
-      admin_name: 'Aditya Gore',
-      admin_tagline: 'Full Stack Web Developer • Database Administrator',
-      admin_quote: 'Build. Improve. Repeat.',
-      contact_email: 'adityagore@example.com',
-      linkedin_url: 'https://www.linkedin.com/in/aditya-gore-b37233266/',
-      github_url: 'https://github.com/Aditya-Gore22',
-      portfolio_url: 'https://aditya-gore.dev'
+      site_title: process.env.SITE_TITLE || '',
+      admin_name: process.env.ADMIN_FULL_NAME || '',
+      admin_tagline: process.env.ADMIN_TAGLINE || '',
+      admin_quote: process.env.ADMIN_QUOTE || '',
+      contact_email: process.env.CONTACT_EMAIL || process.env.ADMIN_EMAIL || '',
+      linkedin_url: process.env.LINKEDIN_URL || '',
+      github_url: process.env.GITHUB_URL || '',
+      portfolio_url: process.env.PORTFOLIO_URL || '',
+      resume_url: '/Aditya_Gore_Resume.pdf',
+      resume_filename: 'Aditya_Gore_Resume.pdf',
+      resume_filesize: '46.2 KB',
+      resume_updated_at: '12 Sep 2026',
+      resume_version: '2.1'
     };
 
     const settingsMap = { ...defaultSettings };
@@ -963,6 +1012,100 @@ app.put('/api/settings', requireAuth, async (req, res) => {
     }
 
     return res.status(200).json({ success: true, message: 'Settings updated successfully.' });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ==========================================
+// RESUME UPLOAD & RETRIEVAL API
+// ==========================================
+
+app.post('/api/resume/upload', requireAuth, uploadResume.single('resume'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Please select a valid PDF file to upload.' });
+    }
+
+    const pool = getPool();
+    const resumeUrl = `/uploads/${req.file.filename}`;
+    const resumeFilename = req.file.originalname || 'Aditya_Gore_Resume.pdf';
+    
+    // Calculate file size
+    const sizeInKb = (req.file.size / 1024).toFixed(1);
+    const resumeFilesize = req.file.size > (1024 * 1024)
+      ? `${(req.file.size / (1024 * 1024)).toFixed(2)} MB`
+      : `${sizeInKb} KB`;
+
+    // Date formatting (e.g., "12 Sep 2026")
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    const resumeUpdatedAt = req.body.updated_at || formattedDate;
+    const resumeVersion = req.body.version || '2.1';
+
+    // Store resume metadata in site_settings
+    const updates = [
+      ['resume_url', resumeUrl],
+      ['resume_filename', resumeFilename],
+      ['resume_filesize', resumeFilesize],
+      ['resume_updated_at', resumeUpdatedAt],
+      ['resume_version', resumeVersion]
+    ];
+
+    for (const [k, v] of updates) {
+      await pool.query(
+        `INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE setting_value = ?`,
+        [k, v, v]
+      );
+    }
+
+    // Also overwrite client/public/Aditya_Gore_Resume.pdf so direct static link stays in sync
+    try {
+      const publicPath = path.join(__dirname, '..', 'client', 'public', 'Aditya_Gore_Resume.pdf');
+      fs.copyFileSync(req.file.path, publicPath);
+    } catch (copyErr) {
+      console.warn('Could not copy to client/public:', copyErr.message);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Resume uploaded and published successfully!',
+      resume: {
+        resume_url: resumeUrl,
+        resume_filename: resumeFilename,
+        resume_filesize: resumeFilesize,
+        resume_updated_at: resumeUpdatedAt,
+        resume_version: resumeVersion
+      }
+    });
+  } catch (err) {
+    console.error('Resume upload error:', err);
+    return res.status(500).json({ success: false, error: err.message || 'Failed to upload resume.' });
+  }
+});
+
+app.get('/api/resume', async (req, res) => {
+  try {
+    const pool = getPool();
+    const [rows] = await pool.query(
+      `SELECT setting_key, setting_value FROM site_settings 
+       WHERE setting_key IN ('resume_url', 'resume_filename', 'resume_filesize', 'resume_updated_at', 'resume_version')`
+    );
+
+    const resumeMap = {
+      resume_url: '/Aditya_Gore_Resume.pdf',
+      resume_filename: 'Aditya_Gore_Resume.pdf',
+      resume_filesize: '46.2 KB',
+      resume_updated_at: '12 Sep 2026',
+      resume_version: '2.1'
+    };
+
+    rows.forEach(r => {
+      resumeMap[r.setting_key] = r.setting_value;
+    });
+
+    return res.status(200).json({ success: true, resume: resumeMap });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
@@ -1083,7 +1226,7 @@ app.post('/api/game/score', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Aditya Gore Portfolio & Admin API is operational with MySQL, UUID, and JWT.');
+  res.send('Portfolio & Admin API is operational with MySQL, UUID, and JWT.');
 });
 
 // ==========================================

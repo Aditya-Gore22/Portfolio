@@ -10,14 +10,16 @@ const ContactCTA = ({ onNavigate }) => {
   };
 
   return (
-    <section id="contact-cta-banner" className="contact-cta">
-      <div className="contact-cta-overlay"></div>
-      <div className="contact-cta-content">
-        <button type="button" onClick={handleClick} className="contact-cta-button">
-          GET IN TOUCH &rarr;
-        </button>
-      </div>
-    </section>
+    <div className="contact-cta-wrapper">
+      <section id="contact-cta-banner" className="contact-cta">
+        <div className="contact-cta-overlay"></div>
+        <div className="contact-cta-content">
+          <button type="button" onClick={handleClick} className="contact-cta-button">
+            GET IN TOUCH &rarr;
+          </button>
+        </div>
+      </section>
+    </div>
   );
 };
 

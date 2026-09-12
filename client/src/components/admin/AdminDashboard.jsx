@@ -31,10 +31,14 @@ import {
   FaShieldAlt,
   FaKey,
   FaQuoteLeft,
-  FaSave
+  FaSave,
+  FaFileAlt,
+  FaFilePdf,
+  FaDownload
 } from 'react-icons/fa';
 import { MdDashboard, MdOutlineMarkEmailRead } from 'react-icons/md';
 import { useSettings } from '../../context/SettingsContext.jsx';
+import { apiUrl } from '../../utils/api';
 
 const AdminDashboard = ({ onNavigate }) => {
   const { updateSettings: updateContextSettings, refreshSettings } = useSettings();
@@ -43,7 +47,7 @@ const AdminDashboard = ({ onNavigate }) => {
   const [token, setToken] = useState(() => localStorage.getItem('portfolio_admin_token') || '');
   const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(localStorage.getItem('portfolio_admin_token')));
   const [loginForm, setLoginForm] = useState({
-    email: localStorage.getItem('portfolio_remembered_email') || 'adityagore@example.com',
+    email: localStorage.getItem('portfolio_remembered_email') || '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -98,18 +102,18 @@ const AdminDashboard = ({ onNavigate }) => {
   const [gamingStats, setGamingStats] = useState({
     totalPlays: 0,
     totalBugsSquashed: 0,
-    bestTimeSeconds: 48,
-    bestTimeFormatted: '00:48',
-    favoriteHero: 'Aditya',
+    bestTimeSeconds: 0,
+    bestTimeFormatted: '--:--',
+    favoriteHero: '--',
     recentScores: []
   });
   const [adminProfile, setAdminProfile] = useState({
     id: '',
-    username: 'aditya',
-    full_name: 'Aditya Gore',
-    email: 'adityagore@example.com',
-    linkedin_url: 'https://www.linkedin.com/in/aditya-gore-b37233266/',
-    github_url: 'https://github.com/Aditya-Gore22',
+    username: '',
+    full_name: '',
+    email: '',
+    linkedin_url: '',
+    github_url: '',
     role: 'admin'
   });
   const [profileStatus, setProfileStatus] = useState({ type: '', message: '' });
@@ -123,14 +127,14 @@ const AdminDashboard = ({ onNavigate }) => {
   });
 
   const [settings, setSettings] = useState({
-    site_title: 'Aditya Gore - Full Stack Developer',
-    admin_quote: 'Build. Improve. Repeat.',
-    admin_name: 'Aditya Gore',
-    admin_role: 'Admin & Lead Developer',
-    contact_email: 'adityagore@example.com',
-    portfolio_url: 'https://aditya-gore.dev',
-    github_url: 'https://github.com/adityagore',
-    linkedin_url: 'https://linkedin.com/in/adityagore'
+    site_title: '',
+    admin_quote: '',
+    admin_name: '',
+    admin_role: '',
+    contact_email: '',
+    portfolio_url: '',
+    github_url: '',
+    linkedin_url: ''
   });
 
   const [loading, setLoading] = useState(true);
@@ -153,6 +157,16 @@ const AdminDashboard = ({ onNavigate }) => {
   const [uploadError, setUploadError] = useState('');
   const fileInputRef = useRef(null);
 
+  // Resume upload state
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [resumeStatus, setResumeStatus] = useState({ type: '', message: '' });
+  const [resumeSelectedFileName, setResumeSelectedFileName] = useState('');
+  const [resumeForm, setResumeForm] = useState({
+    version: '2.1',
+    updated_at: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  });
+  const resumeFileInputRef = useRef(null);
+
   // Form states
   const [projectForm, setProjectForm] = useState({
     title: '',
@@ -161,6 +175,8 @@ const AdminDashboard = ({ onNavigate }) => {
     category: 'Full Stack',
     image: '/images/02_construction_project.png',
     tags: 'React, Node.js, MySQL',
+    features: '',
+    techStack: '',
     liveDemoUrl: '',
     githubUrl: '',
     published: true
@@ -195,7 +211,7 @@ const AdminDashboard = ({ onNavigate }) => {
       ...(currentToken ? { 'Authorization': `Bearer ${currentToken}` } : {})
     };
 
-    const res = await fetch(url, { ...options, headers });
+    const res = await fetch(apiUrl(url), { ...options, headers });
     if (res.status === 401) {
       localStorage.removeItem('portfolio_admin_token');
       setToken('');
@@ -209,13 +225,13 @@ const AdminDashboard = ({ onNavigate }) => {
     try {
       setLoading(true);
       const [statsRes, projectsRes, messagesRes, visitorsRes, skillsRes, gameRes, healthRes] = await Promise.all([
-        fetch('/api/admin/stats').then(r => r.json()).catch(() => null),
-        fetch('/api/projects?all=true').then(r => r.json()).catch(() => null),
-        fetch('/api/messages').then(r => r.json()).catch(() => null),
-        fetch(`/api/admin/visitors?days=${visitorTimeRange}`).then(r => r.json()).catch(() => null),
-        fetch('/api/skills').then(r => r.json()).catch(() => null),
-        fetch('/api/game/stats').then(r => r.json()).catch(() => null),
-        fetch('/api/admin/health').then(r => r.json()).catch(() => null)
+        fetch(apiUrl('/api/admin/stats')).then(r => r.json()).catch(() => null),
+        fetch(apiUrl('/api/projects?all=true')).then(r => r.json()).catch(() => null),
+        fetch(apiUrl('/api/messages')).then(r => r.json()).catch(() => null),
+        fetch(apiUrl(`/api/admin/visitors?days=${visitorTimeRange}`)).then(r => r.json()).catch(() => null),
+        fetch(apiUrl('/api/skills')).then(r => r.json()).catch(() => null),
+        fetch(apiUrl('/api/game/stats')).then(r => r.json()).catch(() => null),
+        fetch(apiUrl('/api/admin/health')).then(r => r.json()).catch(() => null)
       ]);
 
       if (statsRes && statsRes.success) setStats(statsRes.stats);
@@ -226,9 +242,9 @@ const AdminDashboard = ({ onNavigate }) => {
       if (gameRes && gameRes.success) setGamingStats(gameRes.stats);
       if (healthRes && healthRes.success) setHealthData(healthRes);
 
-      fetch('/api/achievements').then(r => r.json()).then(d => d.success && setAchievements(d.data)).catch(() => {});
-      fetch('/api/experiences').then(r => r.json()).then(d => d.success && setExperiences(d.data)).catch(() => {});
-      fetch('/api/settings').then(r => r.json()).then(d => d.success && setSettings(d.settings)).catch(() => {});
+      fetch(apiUrl('/api/achievements')).then(r => r.json()).then(d => d.success && setAchievements(d.data)).catch(() => {});
+      fetch(apiUrl('/api/experiences')).then(r => r.json()).then(d => d.success && setExperiences(d.data)).catch(() => {});
+      fetch(apiUrl('/api/settings')).then(r => r.json()).then(d => d.success && setSettings(d.settings)).catch(() => {});
 
       // Load logged-in admin profile
       authFetch('/api/auth/me').then(r => r.json()).then(d => {
@@ -326,7 +342,7 @@ const AdminDashboard = ({ onNavigate }) => {
         localStorage.removeItem('portfolio_remembered_email');
       }
 
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -449,9 +465,12 @@ const AdminDashboard = ({ onNavigate }) => {
       category: 'Full Stack',
       image: '/images/02_construction_project.png',
       tags: 'React, Node.js, MySQL',
+      features: '',
+      techStack: '',
       liveDemoUrl: '',
       githubUrl: '',
-      published: true
+      published: true,
+      gallery: []
     });
     setIsAddProjectModalOpen(true);
   };
@@ -466,9 +485,14 @@ const AdminDashboard = ({ onNavigate }) => {
       category: project.category || 'Full Stack',
       image: project.image || '/images/02_construction_project.png',
       tags: Array.isArray(project.tags) ? project.tags.join(', ') : (project.tags || ''),
+      features: Array.isArray(project.features) ? project.features.join('\n') : (project.features || ''),
+      techStack: Array.isArray(project.techStack) 
+        ? project.techStack.map(t => typeof t === 'object' ? t.name : t).join(', ') 
+        : (project.techStack || ''),
       liveDemoUrl: project.liveDemoUrl || '',
       githubUrl: project.githubUrl || '',
-      published: project.published !== undefined ? project.published : true
+      published: project.published !== undefined ? project.published : true,
+      gallery: Array.isArray(project.gallery) ? project.gallery : []
     });
     setIsAddProjectModalOpen(true);
   };
@@ -476,9 +500,19 @@ const AdminDashboard = ({ onNavigate }) => {
   const handleSaveProject = async (e) => {
     e.preventDefault();
     try {
+      const parsedTags = projectForm.tags.split(',').map(t => t.trim()).filter(Boolean);
+      const parsedFeatures = projectForm.features
+        ? projectForm.features.split('\n').map(f => f.trim().replace(/^[-*•\d.]+\s*/, '')).filter(Boolean)
+        : [];
+      const parsedTechStack = projectForm.techStack
+        ? projectForm.techStack.split(',').map(t => t.trim()).filter(Boolean).map(name => ({ name, icon: name }))
+        : parsedTags.map(name => ({ name, icon: name }));
+
       const payload = {
         ...projectForm,
-        tags: projectForm.tags.split(',').map(t => t.trim()).filter(Boolean)
+        tags: parsedTags,
+        features: parsedFeatures,
+        techStack: parsedTechStack
       };
 
       let res;
@@ -501,11 +535,11 @@ const AdminDashboard = ({ onNavigate }) => {
         setIsAddProjectModalOpen(false);
         loadDashboardData();
       } else {
-        alert(json.message || 'Error saving project');
+        alert(json.message || json.error || 'Error saving project');
       }
     } catch (err) {
       console.error(err);
-      alert('Network error saving project');
+      alert('Network error saving project: ' + err.message);
     }
   };
 
@@ -737,6 +771,62 @@ const AdminDashboard = ({ onNavigate }) => {
     }
   };
 
+  const handleResumeFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setResumeSelectedFileName(file.name);
+      setResumeStatus({ type: '', message: '' });
+    }
+  };
+
+  const handleResumeUpload = async (e) => {
+    e.preventDefault();
+    const file = resumeFileInputRef.current?.files[0];
+    if (!file) {
+      setResumeStatus({ type: 'error', message: 'Please select a PDF resume file first.' });
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      setResumeStatus({ type: 'error', message: 'Only PDF documents (.pdf) are allowed.' });
+      return;
+    }
+
+    setResumeUploading(true);
+    setResumeStatus({ type: '', message: '' });
+
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
+      formData.append('version', resumeForm.version || '2.1');
+      formData.append('updated_at', resumeForm.updated_at);
+
+      const res = await authFetch('/api/resume/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (data.success && data.resume) {
+        setResumeStatus({ type: 'success', message: 'Resume uploaded and published live across your portfolio!' });
+        setSettings(prev => ({
+          ...prev,
+          ...data.resume
+        }));
+        updateContextSettings(data.resume);
+        if (refreshSettings) refreshSettings();
+        setResumeSelectedFileName('');
+        if (resumeFileInputRef.current) resumeFileInputRef.current.value = '';
+      } else {
+        setResumeStatus({ type: 'error', message: data.message || data.error || 'Upload failed.' });
+      }
+    } catch (err) {
+      setResumeStatus({ type: 'error', message: 'Upload error: ' + err.message });
+    } finally {
+      setResumeUploading(false);
+    }
+  };
+
   // Filtered search list
   const filteredProjects = projects.filter(p => 
     p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -749,19 +839,9 @@ const AdminDashboard = ({ onNavigate }) => {
     (m.subject && m.subject.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // Fallback visitor data if needed
-  const displayVisitors = visitors.length > 0 ? visitors : [
-    { label: 'Aug 15', views: 22 },
-    { label: 'Aug 18', views: 35 },
-    { label: 'Aug 20', views: 42 },
-    { label: 'Aug 25', views: 28 },
-    { label: 'Aug 30', views: 65 },
-    { label: 'Sep 04', views: 120 },
-    { label: 'Sep 09', views: 88 },
-    { label: 'Sep 12', views: 60 }
-  ];
-
-  const maxViews = Math.max(...displayVisitors.map(v => v.views || 0), 150);
+  // Real visitor logs from database
+  const displayVisitors = visitors;
+  const maxViews = displayVisitors.length > 0 ? Math.max(...displayVisitors.map(v => v.views || 0), 10) : 10;
 
   // ====================================================
   // RENDER LOGIN SCREEN IF NOT AUTHENTICATED
@@ -1061,6 +1141,15 @@ const AdminDashboard = ({ onNavigate }) => {
 
           <button
             type="button"
+            className={`admin-nav-item ${activeTab === 'resume' ? 'active' : ''}`}
+            onClick={() => setActiveTab('resume')}
+          >
+            <FaFileAlt className="nav-icon" />
+            <span>Resume</span>
+          </button>
+
+          <button
+            type="button"
             className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
@@ -1076,16 +1165,12 @@ const AdminDashboard = ({ onNavigate }) => {
         </div>
 
         {/* Bottom Pixel Art Illustration Card */}
-        <div className="sidebar-pixel-card">
-          <div className="pixel-art-backdrop">
-            <div className="pixel-sun"></div>
-            <div className="pixel-skyline"></div>
-            <div className="pixel-silhouette-hero"></div>
-          </div>
-          <div className="pixel-slogan-box">
-            <span className="pixel-slogan-line">SAME PASSION</span>
-            <span className="pixel-slogan-line">DIFFERENT LEVEL</span>
-          </div>
+        <div className="sidebar-pixel-card" title="Same Passion. Different Level.">
+          <img 
+            src="/images/sidebar_hero_banner.jpg" 
+            alt="Same Passion Different Level" 
+            className="sidebar-pixel-img"
+          />
         </div>
       </aside>
 
@@ -1169,7 +1254,7 @@ const AdminDashboard = ({ onNavigate }) => {
                     <span className="user-label">LOGGED IN AS</span>
                     <strong className="user-username">{adminProfile.username || 'aditya'}</strong>
                     <span className="user-email" style={{ fontSize: '11px', color: 'var(--admin-text-secondary)', display: 'block', margin: '2px 0 6px' }}>
-                      {adminProfile.email || 'adityagore@example.com'}
+                      {adminProfile.email || 'adityagore2025@gmail.com'}
                     </span>
                     <span className="user-badge">JWT Authenticated</span>
                   </div>
@@ -1513,22 +1598,28 @@ const AdminDashboard = ({ onNavigate }) => {
                     </div>
 
                     <div className="chart-bars-track">
-                      {displayVisitors.map((item, idx) => {
-                        const heightPct = Math.min(100, Math.max(8, (item.views / maxViews) * 100));
-                        return (
-                          <div key={idx} className="chart-bar-col" title={`${item.label}: ${item.views} visitors`}>
-                            <div className="chart-bar-fill-wrap">
-                              <div 
-                                className="chart-bar-glow-fill" 
-                                style={{ height: `${heightPct}%` }}
-                              ></div>
+                      {displayVisitors.length === 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'var(--admin-text-secondary, #94a3b8)', fontSize: '13px', fontStyle: 'italic' }}>
+                          No visitor logs recorded yet. Real visits will display dynamically.
+                        </div>
+                      ) : (
+                        displayVisitors.map((item, idx) => {
+                          const heightPct = Math.min(100, Math.max(8, (item.views / maxViews) * 100));
+                          return (
+                            <div key={idx} className="chart-bar-col" title={`${item.label}: ${item.views} visitors`}>
+                              <div className="chart-bar-fill-wrap">
+                                <div 
+                                  className="chart-bar-glow-fill" 
+                                  style={{ height: `${heightPct}%` }}
+                                ></div>
+                              </div>
+                              {(idx % 4 === 0 || idx === displayVisitors.length - 1) && (
+                                <span className="bar-date-label">{item.label}</span>
+                              )}
                             </div>
-                            {(idx % 4 === 0 || idx === displayVisitors.length - 1) && (
-                              <span className="bar-date-label">{item.label}</span>
-                            )}
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1974,7 +2065,7 @@ const AdminDashboard = ({ onNavigate }) => {
                         value={adminProfile.email || ''} 
                         onChange={(e) => setAdminProfile({ ...adminProfile, email: e.target.value })}
                         className="admin-input" 
-                        placeholder="adityagore@example.com"
+                        placeholder="yourname@gmail.com"
                       />
                     </div>
                     <div className="profile-field">
@@ -2219,7 +2310,7 @@ const AdminDashboard = ({ onNavigate }) => {
                     className="admin-input"
                     value={settings.contact_email || ''}
                     onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
-                    placeholder="adityagore@example.com"
+                    placeholder="yourname@gmail.com"
                   />
                 </div>
 
@@ -2309,6 +2400,188 @@ const AdminDashboard = ({ onNavigate }) => {
             </div>
           )}
 
+          {/* ==================================================== */}
+          {/* TAB 10: RESUME MANAGEMENT                            */}
+          {/* ==================================================== */}
+          {activeTab === 'resume' && (
+            <div className="admin-subview-content">
+              <div className="subview-header">
+                <div>
+                  <h2 className="subview-title">Resume &amp; Career Loadout</h2>
+                  <p className="subview-desc">Upload your PDF resume. It will be immediately published to the live portfolio and downloadable by recruiters.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button 
+                    type="button" 
+                    className="subview-action-btn secondary"
+                    onClick={() => {
+                      if (onNavigate) onNavigate('resume');
+                    }}
+                  >
+                    <FaExternalLinkAlt /> View Live Resume Page
+                  </button>
+                  <a
+                    href={settings.resume_url || '/Aditya_Gore_Resume.pdf'}
+                    download={settings.resume_filename || 'Aditya_Gore_Resume.pdf'}
+                    className="subview-action-btn primary"
+                  >
+                    <FaDownload /> Download Current PDF
+                  </a>
+                </div>
+              </div>
+
+              {resumeStatus.message && (
+                <div className={`resume-admin-alert ${resumeStatus.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+                  {resumeStatus.type === 'error' ? <FaTimes /> : <FaCheckCircle />}
+                  <span>{resumeStatus.message}</span>
+                </div>
+              )}
+
+              <div className="resume-admin-grid">
+                {/* Left Column: Upload & Metadata */}
+                <div className="resume-admin-left">
+                  {/* Upload Form Card */}
+                  <div className="resume-upload-card">
+                    <h3 className="card-section-title">
+                      <FaUpload style={{ color: '#a855f7' }} /> Upload New Resume (.pdf)
+                    </h3>
+                    <p className="card-section-desc">
+                      Upload your latest resume. It will automatically update the interactive PDF viewer and download links across the website.
+                    </p>
+
+                    <form onSubmit={handleResumeUpload} className="resume-upload-form">
+                      <div 
+                        className="resume-dropzone" 
+                        onClick={() => resumeFileInputRef.current?.click()}
+                      >
+                        <FaFilePdf className="dropzone-pdf-icon" />
+                        <div className="dropzone-text">
+                          {resumeSelectedFileName ? (
+                            <span className="selected-filename">
+                              <FaCheckCircle style={{ color: '#22c55e', marginRight: '6px' }} />
+                              {resumeSelectedFileName}
+                            </span>
+                          ) : (
+                            <>
+                              <strong>Click here to browse PDF file</strong>
+                              <span>or drag and drop your updated resume here</span>
+                            </>
+                          )}
+                        </div>
+                        <span className="dropzone-badge">PDF only (Max 30MB)</span>
+                        <input 
+                          type="file"
+                          ref={resumeFileInputRef}
+                          onChange={handleResumeFileSelect}
+                          accept="application/pdf,.pdf"
+                          style={{ display: 'none' }}
+                        />
+                      </div>
+
+                      <div className="resume-fields-row">
+                        <div className="resume-field">
+                          <label>Resume Version</label>
+                          <input 
+                            type="text"
+                            className="admin-input"
+                            value={resumeForm.version}
+                            onChange={(e) => setResumeForm({ ...resumeForm, version: e.target.value })}
+                            placeholder="e.g. 2.1"
+                          />
+                        </div>
+                        <div className="resume-field">
+                          <label>Updated Date Label</label>
+                          <input 
+                            type="text"
+                            className="admin-input"
+                            value={resumeForm.updated_at}
+                            onChange={(e) => setResumeForm({ ...resumeForm, updated_at: e.target.value })}
+                            placeholder="e.g. 12 Sep 2026"
+                          />
+                        </div>
+                      </div>
+
+                      <button 
+                        type="submit" 
+                        disabled={resumeUploading}
+                        className="btn-upload-resume-submit"
+                      >
+                        {resumeUploading ? (
+                          <>
+                            <FaSpinner className="spin" /> Uploading &amp; Publishing...
+                          </>
+                        ) : (
+                          <>
+                            <FaUpload /> Upload &amp; Publish Resume
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Active Resume Information Card */}
+                  <div className="resume-info-card">
+                    <h3 className="card-section-title">
+                      <FaFileAlt style={{ color: '#38bdf8' }} /> Currently Active Resume
+                    </h3>
+                    <div className="resume-meta-table">
+                      <div className="resume-meta-item">
+                        <span className="meta-k">File Name</span>
+                        <span className="meta-v highlight">{settings.resume_filename || 'Aditya_Gore_Resume.pdf'}</span>
+                      </div>
+                      <div className="resume-meta-item">
+                        <span className="meta-k">File Size</span>
+                        <span className="meta-v">{settings.resume_filesize || '46.2 KB'}</span>
+                      </div>
+                      <div className="resume-meta-item">
+                        <span className="meta-k">Last Published</span>
+                        <span className="meta-v">{settings.resume_updated_at || '12 Sep 2026'}</span>
+                      </div>
+                      <div className="resume-meta-item">
+                        <span className="meta-k">Version</span>
+                        <span className="meta-v">{settings.resume_version || '2.1'}</span>
+                      </div>
+                      <div className="resume-meta-item">
+                        <span className="meta-k">Public Path</span>
+                        <span className="meta-v path-code">{settings.resume_url || '/Aditya_Gore_Resume.pdf'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Live PDF Document Preview */}
+                <div className="resume-admin-right">
+                  <div className="resume-preview-card">
+                    <div className="preview-card-header">
+                      <div className="preview-title-group">
+                        <FaFilePdf style={{ color: '#ef4444', fontSize: '1.2rem' }} />
+                        <span>Live Document Preview</span>
+                      </div>
+                      <div className="preview-actions">
+                        <a 
+                          href={settings.resume_url || '/Aditya_Gore_Resume.pdf'} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="preview-open-btn"
+                          title="Open PDF in new tab"
+                        >
+                          <FaExternalLinkAlt /> Open Full
+                        </a>
+                      </div>
+                    </div>
+                    <div className="admin-pdf-frame-wrapper">
+                      <iframe 
+                        src={`${settings.resume_url || '/Aditya_Gore_Resume.pdf'}#toolbar=1`} 
+                        className="admin-pdf-preview-frame"
+                        title="Resume Document Preview"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
         </main>
 
         {/* 4. FOOTER */}
@@ -2384,6 +2657,42 @@ const AdminDashboard = ({ onNavigate }) => {
                 />
               </div>
 
+              <div className="form-group">
+                <label>Tech Stack Badges (comma separated)</label>
+                <input 
+                  type="text" 
+                  className="admin-input"
+                  placeholder="e.g. Next.js, React, TypeScript, OpenAI, Node.js, TailwindCSS"
+                  value={projectForm.techStack}
+                  onChange={e => setProjectForm({ ...projectForm, techStack: e.target.value })}
+                />
+                <small style={{ color: '#888', fontSize: '11px', marginTop: '4px', display: 'block' }}>
+                  Leave empty to automatically use Technologies / Tags.
+                </small>
+              </div>
+
+              <div className="form-group">
+                <label>Key Features (One feature per line)</label>
+                <textarea 
+                  rows="4" 
+                  className="admin-input"
+                  placeholder={"AI-Powered Medical Voice Agent\nAutomated prescription & medical record parsing\nInteractive biometric health tracker"}
+                  value={projectForm.features}
+                  onChange={e => setProjectForm({ ...projectForm, features: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Full / Detailed Description (Optional)</label>
+                <textarea 
+                  rows="3" 
+                  className="admin-input"
+                  placeholder="Comprehensive description for the dedicated project detail page"
+                  value={projectForm.fullDescription}
+                  onChange={e => setProjectForm({ ...projectForm, fullDescription: e.target.value })}
+                />
+              </div>
+
               {/* MULTIPART PHOTO UPLOAD SECTION */}
               <div className="form-group upload-form-group">
                 <label>Project Image (Multipart Upload / Random UUID Renamed)</label>
@@ -2450,7 +2759,7 @@ const AdminDashboard = ({ onNavigate }) => {
                   <input 
                     type="url" 
                     className="admin-input"
-                    placeholder="https://demo.example.com"
+                    placeholder="https://your-live-demo.com"
                     value={projectForm.liveDemoUrl}
                     onChange={e => setProjectForm({ ...projectForm, liveDemoUrl: e.target.value })}
                   />

@@ -6,119 +6,214 @@
 }
 
 .asa-container {
-  max-width: 1280px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 28px;
 }
 
 .asa-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
+  align-items: stretch;
 }
 
-.asa-col {
+/* ================= UNIFIED RETRO GAMER CARD PANEL ================= */
+.asa-card-panel {
+  background: #020913;
+  border-radius: 14px;
+  padding: 20px 20px 18px 20px;
+  border: 1px solid #142036;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  justify-content: space-between;
+  height: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.asa-header {
+/* Subtle gamer watermark */
+.asa-about-card::before {
+  content: '';
+  position: absolute;
+  top: 40%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(29, 78, 216, 0.07) 0%, rgba(2, 9, 19, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Unified Card Header inside every card */
+.asa-card-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 60px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  min-height: 28px;
 }
 
-.asa-pixel-char {
-  height: 60px;
-  image-rendering: pixelated;
-}
-
-.asa-title {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.85rem;
-  color: white;
-  margin: 0;
-  letter-spacing: 1px;
-}
-
-.asa-hearts {
+.asa-header-left {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 10px;
+}
+
+.asa-card-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.95rem;
+  color: #ffffff;
+  letter-spacing: 1.5px;
+  margin: 0;
+}
+
+.asa-header-icon {
+  font-size: 1.15rem;
+}
+
+.asa-icon-cog {
   color: #ef4444;
 }
 
-.asa-icon-red {
-  color: #ef4444;
-  font-size: 1.5rem;
+.asa-icon-trophy {
+  color: #f59e0b;
+}
+
+.asa-about-hearts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.asa-pixel-heart {
+  width: 16px;
+  height: 14px;
+  image-rendering: pixelated;
 }
 
 .asa-level {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-left: auto;
+  gap: 6px;
 }
 
-.asa-level-text {
+.asa-level-text,
+.asa-status-text {
   font-family: 'Press Start 2P', cursive;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   color: #94a3b8;
 }
 
 .asa-level-squares {
   color: #22c55e;
-  font-size: 0.8rem;
-  letter-spacing: 2px;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
 }
 
-.asa-card {
-  background-color: #111827;
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid #1e293b;
+.asa-ach-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.asa-status-badge {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.6rem;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* ================= CARD 1: ABOUT ME ================= */
+.asa-about-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 14px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.asa-about-char-col {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2px;
+}
+
+.asa-about-char {
+  width: 80px;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+.asa-about-content-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.asa-about-greeting {
+  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.1px;
+}
+
+.asa-about-text {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  line-height: 1.52;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.05px;
+}
+
+.asa-about-quote-box {
+  border: 1.5px solid #e5a93c;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background-color: #030814;
+  position: relative;
+  z-index: 1;
+  box-shadow: inset 0 0 10px rgba(229, 169, 60, 0.04);
+}
+
+.asa-about-quote-text {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.58rem;
+  color: #e5a93c;
+  margin: 0;
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+/* ================= CARD 2: SKILLS ================= */
+.asa-skills-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.asa-greeting {
-  color: white;
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin: 0 0 16px 0;
-}
-
-.asa-bio {
-  color: #94a3b8;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  margin: 0 0 24px 0;
-  flex: 1;
-}
-
-.asa-quote-box {
-  border: 1px dashed #ef4444;
-  border-radius: 8px;
-  padding: 16px;
-  background-color: rgba(239, 68, 68, 0.04);
-}
-
-.asa-quote-text {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.6rem;
-  color: #f87171;
-  text-align: center;
-  margin: 0;
-  line-height: 1.8;
+  justify-content: center;
+  padding: 6px 0;
 }
 
 .asa-skills-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  height: 100%;
+  gap: 14px 8px;
 }
 
 .asa-skill-item {
@@ -126,73 +221,105 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 12px 4px;
+  gap: 8px;
+  padding: 10px 4px;
   transition: all 0.2s ease;
-}
-
-.asa-skill-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
 }
 
-.asa-skill-item span {
-  font-size: 0.7rem;
-  color: #64748b;
-  text-align: center;
+.asa-skill-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
 }
 
-.asa-achievements-card {
+.asa-skill-item span {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ================= CARD 3: ACHIEVEMENTS ================= */
+.asa-ach-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   gap: 10px;
 }
 
 .asa-ach-item {
-  background-color: #1a1f2e;
+  background-color: #050d1d;
+  border: 1px solid #142036;
   border-radius: 10px;
-  padding: 14px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   transition: all 0.2s ease;
-  margin-bottom: 10px;
-}
-.asa-ach-item:last-child {
-  margin-bottom: 0;
 }
 
 .asa-ach-item:hover {
   transform: translateX(4px);
-  background-color: #1e2538;
+  background-color: #09142b;
+  border-color: #1e3a5f;
 }
 
 .asa-ach-icon {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
 }
 
 .asa-ach-text h4 {
   color: white;
-  font-size: 0.9rem;
-  font-weight: bold;
-  margin: 0 0 4px 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin: 0 0 2px 0;
 }
 
 .asa-ach-text p {
   color: #64748b;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   margin: 0;
 }
 
-@media (max-width: 1024px) {
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1100px) {
   .asa-grid {
     grid-template-columns: 1fr;
+    max-width: 620px;
+    margin: 0 auto;
+    gap: 28px;
   }
 }
+
+@media (max-width: 540px) {
+  .asa-about-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .asa-card-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .asa-skills-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .asa-about-quote-text {
+    font-size: 0.54rem;
+    text-align: center;
+  }
+}
+

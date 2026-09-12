@@ -1,14 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiUrl } from '../utils/api';
 
 const defaultSettings = {
   site_title: 'Aditya Gore | Full Stack Developer Portfolio',
   admin_name: 'Aditya Gore',
   admin_tagline: 'Developer × Gamer',
   admin_quote: 'Build. Improve. Repeat.',
-  contact_email: 'aditya.gore@example.com',
+  contact_email: 'adityagore2025@gmail.com',
   linkedin_url: 'https://www.linkedin.com/in/aditya-gore-b37233266/',
   github_url: 'https://github.com/Aditya-Gore22',
-  portfolio_url: 'https://aditya-gore.dev'
+  portfolio_url: 'https://aditya-gore.dev',
+  resume_url: '/Aditya_Gore_Resume.pdf',
+  resume_filename: 'Aditya_Gore_Resume.pdf',
+  resume_filesize: '46.2 KB',
+  resume_updated_at: '12 Sep 2026',
+  resume_version: '2.1'
 };
 
 const SettingsContext = createContext({
@@ -22,7 +28,7 @@ export const SettingsProvider = ({ children }) => {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch('/api/settings');
+      const res = await fetch(apiUrl('/api/settings'));
       const data = await res.json();
       if (data.success && data.settings) {
         setSettings(prev => ({
