@@ -1,0 +1,254 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(10, 14, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.3s ease;
+}
+
+.navbar-scrolled {
+  background: rgba(10, 14, 26, 0.98);
+}
+
+.navbar-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 32px;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.gamepad-icon {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 1.5px;
+}
+
+.logo-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  color: #64748b;
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+.nav-center {
+  display: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.nav-links li a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: #ef4444;
+  transition: width 0.3s ease;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+  color: white;
+}
+
+.nav-links li a:hover::after,
+.nav-links li a.active::after {
+  width: 100%;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+}
+
+.btn-connect {
+  display: none;
+  padding: 8px 20px;
+  border: 1.5px solid #ef4444;
+  border-radius: 20px;
+  color: #ef4444;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-connect:hover {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+.hamburger {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 5px;
+  z-index: 1001;
+}
+
+.hamburger .bar {
+  display: block;
+  width: 25px;
+  height: 2px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.hamburger.active .bar:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.active .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.nav-mobile {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+  transition: clip-path 0.4s ease-in-out;
+}
+
+.nav-mobile.open {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.mobile-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.mobile-links li a {
+  text-decoration: none;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+  display: block;
+}
+
+.btn-connect-mobile {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1.5px solid #ef4444;
+  border-radius: 20px;
+  color: #ef4444;
+  font-weight: 600;
+  background: transparent;
+  text-decoration: none;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-connect-mobile:hover {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+@media (min-width: 768px) {
+  .nav-center {
+    display: block;
+  }
+  
+  .btn-connect {
+    display: inline-block;
+  }
+  
+  .hamburger {
+    display: none;
+  }
+  
+  .nav-mobile {
+    display: none;
+  }
+}
