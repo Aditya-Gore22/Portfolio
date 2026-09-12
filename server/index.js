@@ -21,6 +21,7 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 }
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_jwt_secret_key_change_in_production';
 
 app.use(cors());
