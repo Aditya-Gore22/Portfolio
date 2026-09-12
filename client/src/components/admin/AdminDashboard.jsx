@@ -435,7 +435,7 @@ const AdminDashboard = ({ onNavigate }) => {
         img.onload = () => {
           let width = img.width;
           let height = img.height;
-          const maxDim = 1200;
+          const maxDim = 850; // Optimized for sharp display while keeping size under 50KB
 
           if (width > maxDim || height > maxDim) {
             if (width > height) {
@@ -453,11 +453,11 @@ const AdminDashboard = ({ onNavigate }) => {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // WebP format gives 30% smaller size than JPEG with high quality
-          const dataUrl = canvas.toDataURL('image/webp', 0.82);
+          // WebP format at 0.75 gives high quality at tiny ~35-50KB
+          const dataUrl = canvas.toDataURL('image/webp', 0.75);
           resolve(dataUrl);
         };
-        img.onerror = () => resolve(e.target.result);
+        img.onerror = () => resolve(null);
         img.src = e.target.result;
       };
       reader.onerror = () => resolve(null);
@@ -473,35 +473,15 @@ const AdminDashboard = ({ onNavigate }) => {
     setUploadError('');
 
     try {
-      // 1. Instant client-side optimized preview
       const compressedDataUrl = await compressImage(file);
       if (compressedDataUrl) {
         setProjectForm(prev => ({ ...prev, image: compressedDataUrl }));
-      }
-
-      // 2. Also try uploading to server
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const res = await authFetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        // If upload succeeds and file is smaller than base64, we can keep either
-        if (data.success && data.imageUrl) {
-          // If in local dev or backend has persistent storage, use imageUrl
-          // But if on free cloud (ephemeral disk), base64 in MySQL is much safer!
-          if (!data.imageUrl.startsWith('/uploads/')) {
-            setProjectForm(prev => ({ ...prev, image: data.imageUrl }));
-          }
-        }
+      } else {
+        setUploadError('Failed to read image file. Please try another image.');
       }
     } catch (err) {
-      // If server upload failed (e.g. timeout or sleeping), the compressed base64 still works!
-      console.warn('Server upload note:', err);
+      console.error('Image compression error:', err);
+      setUploadError('Failed to process image.');
     } finally {
       setUploadingImage(false);
     }
