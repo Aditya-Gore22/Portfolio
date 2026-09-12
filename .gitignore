@@ -68,4 +68,4 @@ coverage/
 scratch/
 tmp/
 temp/
-images/
+/images/
