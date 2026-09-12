@@ -1,0 +1,71 @@
+# ==============================================================================
+# Git Ignore Configuration for Aditya Gore Portfolio
+# ==============================================================================
+
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# Environment Variables & Private Secrets (NEVER COMMIT CREDENTIALS)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+server/.env
+
+# Production Build Artifacts
+client/dist/
+dist/
+build/
+
+# Vite Cache
+.vite/
+client/.vite/
+
+# Server Dynamic Uploads (preserves directory structure via .gitkeep)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Logs & Debugging
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE & Text Editor Configuration
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+*.sublime-project
+
+# Testing & Code Coverage
+coverage/
+.nyc_output/
+
+# Temporary / Scratch directories
+scratch/
+tmp/
+temp/
+images/

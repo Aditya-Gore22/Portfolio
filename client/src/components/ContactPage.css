@@ -1,0 +1,685 @@
+.contact-page {
+  background-color: #060a14;
+  min-height: 100vh;
+  padding-top: 90px;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.contact-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 32px 60px;
+}
+
+/* =========================================
+   TOP SECTION: 3-COLUMN HERO GRID
+   ========================================= */
+.contact-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1.4fr;
+  gap: 28px;
+  align-items: stretch;
+  margin-bottom: 50px;
+}
+
+/* Column 1: Info Column */
+.contact-info-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.contact-system-tag {
+  font-family: 'Inter', monospace;
+  font-size: 0.85rem;
+  color: #38bdf8;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.contact-main-heading {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 2.2rem;
+  line-height: 1.3;
+  margin: 0 0 18px 0;
+}
+
+.contact-heading-white {
+  display: block;
+  color: #ffffff;
+}
+
+.contact-heading-blue {
+  display: block;
+  color: #38bdf8;
+  text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+}
+
+.contact-cursor {
+  animation: contactBlink 1s step-end infinite;
+  color: #38bdf8;
+}
+
+@keyframes contactBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.contact-main-desc {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.contact-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-feature-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.contact-feature-card:hover,
+.contact-feature-card.active {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(56, 189, 248, 0.35);
+  transform: translateX(4px);
+}
+
+.contact-feature-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-feature-icon-box.cyan-box {
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  color: #38bdf8;
+}
+
+.contact-feature-icon-box.purple-box {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #c084fc;
+}
+
+.contact-feature-icon-box.magenta-box {
+  background: rgba(236, 72, 153, 0.15);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+  color: #f472b6;
+}
+
+.feature-icon {
+  font-size: 1.25rem;
+}
+
+.feature-controller-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.contact-feature-text h3 {
+  margin: 0 0 2px 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.contact-feature-text p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+/* Column 2: Gamer Room Artwork */
+.contact-room-col {
+  display: flex;
+}
+
+.contact-room-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #1e293b;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  background: #0d121f;
+  display: flex;
+}
+
+.contact-room-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Column 3: Glowing Form Card */
+.contact-form-col {
+  display: flex;
+}
+
+.contact-form-card {
+  width: 100%;
+  background: #090e1b;
+  border: 1.5px solid #2563eb;
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 0 24px rgba(37, 99, 235, 0.28), inset 0 0 20px rgba(37, 99, 235, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.form-card-header {
+  margin-bottom: 20px;
+}
+
+.form-code-tag {
+  font-family: 'Inter', monospace;
+  font-size: 0.75rem;
+  color: #38bdf8;
+  letter-spacing: 1px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.form-pixel-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.05rem;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+}
+
+.form-header-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.form-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* Form inputs */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.form-row-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.label-icon {
+  font-size: 0.9rem;
+  color: #38bdf8;
+}
+
+.input-wrapper,
+.select-wrapper,
+.textarea-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: #64748b;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  background: #10172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.25s ease;
+}
+
+.input-wrapper input:focus,
+.select-wrapper select:focus,
+.textarea-wrapper textarea:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+  background: #131d35;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 10px 12px;
+  background: #10172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-family: 'Inter', sans-serif;
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.textarea-wrapper {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.textarea-wrapper textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: #10172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-family: 'Inter', sans-serif;
+  resize: vertical;
+  min-height: 80px;
+  transition: all 0.25s ease;
+}
+
+.character-count {
+  align-self: flex-end;
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.form-submit-btn {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1.5px solid #ef4444;
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+}
+
+.form-submit-btn:hover:not(:disabled) {
+  background: #ef4444;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
+}
+
+.form-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-send-icon {
+  font-size: 1rem;
+}
+
+/* Success & Error Banners */
+.form-success-banner {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1.5px solid #22c55e;
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  margin: auto 0;
+}
+
+.form-success-banner .success-icon {
+  width: 44px;
+  height: 44px;
+  background: #22c55e;
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 0 auto 12px;
+}
+
+.form-success-banner h3 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.9rem;
+  color: #22c55e;
+  margin: 0 0 10px 0;
+}
+
+.form-success-banner p {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  margin: 0 0 18px 0;
+  line-height: 1.5;
+}
+
+.form-reset-btn {
+  background: #22c55e;
+  color: #052e16;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.form-reset-btn:hover {
+  background: #16a34a;
+}
+
+.form-error-banner {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: #f87171;
+  font-size: 0.82rem;
+}
+
+/* =========================================
+   MIDDLE SECTION: OTHER WAYS TO REACH ME
+   ========================================= */
+.other-ways-section {
+  margin-top: 10px;
+}
+
+.section-title-line {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.pixel-section-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.95rem;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.title-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(56, 189, 248, 0.4), rgba(255, 255, 255, 0.05));
+}
+
+.reach-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.reach-cards-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.reach-card {
+  background: #0d1424;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.reach-card:hover {
+  background: #111a30;
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.reach-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reach-icon-box.cyan-glow {
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  color: #38bdf8;
+}
+
+.reach-icon-box.blue-glow {
+  background: rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(37, 99, 235, 0.4);
+  color: #60a5fa;
+}
+
+.reach-icon-box.dark-glow {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.reach-icon {
+  font-size: 1.25rem;
+}
+
+.reach-card-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.reach-value {
+  display: block;
+  font-size: 0.76rem;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.reach-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.green {
+  background-color: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+
+.status-dot.blue {
+  background-color: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+.status-dot.purple {
+  background-color: #a855f7;
+  box-shadow: 0 0 6px #a855f7;
+}
+
+/* Pixel Scene Col */
+.reach-pixel-scene-col {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.pixel-scene-frame {
+  max-width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pixel-scene-img {
+  width: 100%;
+  height: auto;
+  max-height: 125px;
+  object-fit: contain;
+  display: block;
+}
+
+/* =========================================
+   BOTTOM SUNSET BANNER
+   ========================================= */
+.contact-footer-banner-wrapper {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: #080c18;
+}
+
+.contact-footer-banner-img {
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+  object-fit: cover;
+  display: block;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+@media (max-width: 1100px) {
+  .contact-hero-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .contact-room-col {
+    grid-column: span 2;
+    order: 3;
+    max-height: 320px;
+  }
+  
+  .contact-room-image {
+    max-height: 320px;
+  }
+
+  .reach-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reach-pixel-scene-col {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-page {
+    padding-top: 75px;
+  }
+
+  .contact-container {
+    padding: 16px 20px 40px;
+  }
+
+  .contact-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .contact-room-col {
+    grid-column: span 1;
+    order: 2;
+  }
+
+  .contact-form-col {
+    order: 3;
+  }
+
+  .form-row-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .reach-cards-col {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-main-heading {
+    font-size: 1.6rem;
+  }
+
+  .pixel-section-title {
+    font-size: 0.8rem;
+  }
+}
