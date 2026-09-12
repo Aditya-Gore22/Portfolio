@@ -1,15 +1,22 @@
+.contact-cta-wrapper {
+  padding-top: 10px;
+  background-color: var(--bg-primary, #0a0e1a);
+  width: 100%;
+}
+
 .contact-cta {
   position: relative;
-  min-height: 300px;
+  min-height: 400px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   background-image: url('/images/cta_background.png');
   background-size: cover;
-  background-position: center;
+  background-position: center top;
   background-repeat: no-repeat;
   text-align: center;
   padding: 0 20px 50px;
+  margin-top: 10px;
 }
 
 .contact-cta-overlay {

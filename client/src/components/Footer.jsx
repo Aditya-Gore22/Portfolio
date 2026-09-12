@@ -10,6 +10,8 @@ const Footer = ({ onNavigate }) => {
     e.preventDefault();
     if (section === 'contact') {
       if (onNavigate) onNavigate('contact');
+    } else if (section === 'resume') {
+      if (onNavigate) onNavigate('resume');
     } else {
       if (onNavigate) onNavigate('home', section);
     }
@@ -35,6 +37,7 @@ const Footer = ({ onNavigate }) => {
             <a href="#projects" onClick={(e) => handleNav(e, 'projects')}>Projects</a>
             <a href="#skills" onClick={(e) => handleNav(e, 'about')}>Skills</a>
             <a href="#experience" onClick={(e) => handleNav(e, 'about')}>Experience</a>
+            <a href="#resume" onClick={(e) => handleNav(e, 'resume')}>Resume</a>
             <a href="#game" onClick={(e) => { e.preventDefault(); if (onNavigate) onNavigate('game'); }}>Take a Break</a>
             <a href="#contact" onClick={(e) => handleNav(e, 'contact')}>Contact</a>
             <a href="#admin" onClick={(e) => { e.preventDefault(); if (onNavigate) onNavigate('admin'); }} style={{ color: '#38bdf8' }}>Admin</a>

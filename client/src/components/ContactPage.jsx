@@ -3,6 +3,7 @@ import './ContactPage.css';
 import { FiUser, FiMail, FiList, FiMessageSquare, FiSend, FiBriefcase, FiUsers } from 'react-icons/fi';
 import { FaLinkedinIn, FaGithub } from 'react-icons/fa';
 import { useSettings } from '../context/SettingsContext.jsx';
+import { apiUrl } from '../utils/api';
 
 const ContactPage = ({ onNavigate }) => {
   const { settings } = useSettings();
@@ -45,7 +46,7 @@ const ContactPage = ({ onNavigate }) => {
     setStatus({ submitting: true, success: false, error: null, message: '' });
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(apiUrl('/api/contact'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -78,32 +79,10 @@ const ContactPage = ({ onNavigate }) => {
       }
     } catch (err) {
       console.error('Submission error:', err);
-      // Fallback: if server endpoint unreachable via proxy, try direct port 5000
-      try {
-        const fallbackRes = await fetch('http://localhost:5000/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-        const fallbackData = await fallbackRes.json();
-        if (fallbackRes.ok && fallbackData.success) {
-          setStatus({
-            submitting: false,
-            success: true,
-            error: null,
-            message: fallbackData.message || 'Transmission received!'
-          });
-          setFormData({ name: '', email: '', subject: 'Job Opportunity', message: '' });
-          return;
-        }
-      } catch (fallbackErr) {
-        console.error('Fallback error:', fallbackErr);
-      }
-
       setStatus({
         submitting: false,
         success: false,
-        error: 'Network connection failed. Please check if the server is active.',
+        error: 'Unable to send message right now. Please try again later or email directly.',
         message: ''
       });
     }
@@ -246,7 +225,7 @@ const ContactPage = ({ onNavigate }) => {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          placeholder="you@example.com"
+                          placeholder="you@email.com"
                           required
                         />
                       </div>
@@ -318,7 +297,7 @@ const ContactPage = ({ onNavigate }) => {
             {/* Contact cards */}
             <div className="reach-cards-col">
               {(() => {
-                const contactEmail = settings.contact_email || 'aditya.gore@example.com';
+                const contactEmail = settings.contact_email || 'adityagore2025@gmail.com';
                 const linkedinUrl = settings.linkedin_url || 'https://www.linkedin.com/in/aditya-gore-b37233266/';
                 const linkedinDisplay = linkedinUrl.replace(/^https?:\/\/(www\.)?/, '');
                 const githubUrl = settings.github_url || 'https://github.com/Aditya-Gore22';

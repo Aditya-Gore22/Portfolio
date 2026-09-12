@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import './TakeABreakGame.css';
 import { FaHeart, FaRegHeart, FaPause, FaPlay, FaRedo, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
+import { apiUrl } from '../utils/api';
 
 // Web Audio API synthesizer for retro 8-bit sounds (Zero external libraries)
 class RetroAudio {
@@ -874,7 +875,7 @@ const TakeABreakGame = ({ onNavigate }) => {
                 setDialogueText("Game Over! The bugs broke production. Press Try Again to redeploy!");
                 
                 // Record dynamic run to MySQL
-                fetch('/api/game/score', {
+                fetch(apiUrl('/api/game/score'), {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -949,7 +950,7 @@ const TakeABreakGame = ({ onNavigate }) => {
           );
           
           // Record victory run to MySQL
-          fetch('/api/game/score', {
+          fetch(apiUrl('/api/game/score'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

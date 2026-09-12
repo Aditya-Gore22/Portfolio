@@ -5,8 +5,9 @@
   align-items: center;
   background-image: url('/images/01_hero_background.png');
   background-size: cover;
-  background-position: center right;
+  background-position: right top;
   overflow: hidden;
+  padding-top: 10px;
 }
 
 .hero-overlay {
@@ -23,7 +24,7 @@
   width: 100%;
   margin: auto;
   padding: 0 32px;
-  padding-top: 80px;
+  padding-top: 90px;
 }
 
 .hero-content {

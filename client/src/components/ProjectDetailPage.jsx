@@ -1,37 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import './ProjectDetailPage.css';
+import { apiUrl } from '../utils/api';
 import { 
-  SiReact, SiNodedotjs, SiMysql, SiJsonwebtokens, 
-  SiHtml5, SiCss, SiExpress, SiGit, SiJavascript 
+  SiReact, 
+  SiNodedotjs, 
+  SiMysql, 
+  SiJsonwebtokens, 
+  SiHtml5, 
+  SiCss, 
+  SiExpress, 
+  SiGit, 
+  SiJavascript,
+  SiTypescript,
+  SiNextdotjs,
+  SiTailwindcss,
+  SiMongodb,
+  SiPostgresql,
+  SiPython,
+  SiDocker,
+  SiFirebase,
+  SiBootstrap,
+  SiVite
 } from 'react-icons/si';
-import { FaGithub, FaCheckCircle, FaArrowLeft, FaExternalLinkAlt } from 'react-icons/fa';
+import { 
+  FaGithub, 
+  FaCheckCircle, 
+  FaArrowLeft, 
+  FaExternalLinkAlt, 
+  FaJava, 
+  FaCode, 
+  FaDatabase, 
+  FaServer, 
+  FaRobot, 
+  FaMicrophone,
+  FaAws
+} from 'react-icons/fa';
 import { useSettings } from '../context/SettingsContext.jsx';
 
-// Map icon names from backend JSON to React components
-const renderTechIcon = (iconName, color) => {
-  const iconProps = { size: 28, color: color || '#60a5fa' };
-  switch (iconName) {
-    case 'SiReact':
-      return <SiReact {...iconProps} />;
-    case 'SiNodedotjs':
-      return <SiNodedotjs {...iconProps} />;
-    case 'SiMysql':
-      return <SiMysql {...iconProps} />;
-    case 'SiJsonwebtokens':
-      return <SiJsonwebtokens {...iconProps} />;
-    case 'SiHtml5':
-      return <SiHtml5 {...iconProps} />;
-    case 'SiCss':
-      return <SiCss {...iconProps} />;
-    case 'SiExpress':
-      return <SiExpress {...iconProps} />;
-    case 'SiGit':
-      return <SiGit {...iconProps} />;
-    case 'SiJavascript':
-      return <SiJavascript {...iconProps} />;
-    default:
-      return <span style={{ color: color || '#38bdf8', fontWeight: 'bold' }}>&lt;/&gt;</span>;
-  }
+// Dynamic smart mapper for any technology name or icon identifier
+const renderTechIcon = (techIdentifier, customColor) => {
+  const size = 28;
+  const str = String(techIdentifier || '').toLowerCase().trim();
+
+  if (str.includes('next')) return <SiNextdotjs size={size} color={customColor || '#ffffff'} />;
+  if (str.includes('react')) return <SiReact size={size} color={customColor || '#61dafb'} />;
+  if (str.includes('typescript') || str === 'ts') return <SiTypescript size={size} color={customColor || '#3178c6'} />;
+  if (str.includes('javascript') || str === 'js') return <SiJavascript size={size} color={customColor || '#f7df1e'} />;
+  if (str.includes('node')) return <SiNodedotjs size={size} color={customColor || '#68a063'} />;
+  if (str.includes('express')) return <SiExpress size={size} color={customColor || '#ffffff'} />;
+  if (str.includes('mysql')) return <SiMysql size={size} color={customColor || '#4479a1'} />;
+  if (str.includes('mongo')) return <SiMongodb size={size} color={customColor || '#47a248'} />;
+  if (str.includes('postgres')) return <SiPostgresql size={size} color={customColor || '#4169e1'} />;
+  if (str.includes('tailwind')) return <SiTailwindcss size={size} color={customColor || '#38bdf8'} />;
+  if (str.includes('html')) return <SiHtml5 size={size} color={customColor || '#e34f26'} />;
+  if (str.includes('css')) return <SiCss size={size} color={customColor || '#1572b6'} />;
+  if (str.includes('jwt') || str.includes('token') || str.includes('auth')) return <SiJsonwebtokens size={size} color={customColor || '#d63aff'} />;
+  if (str.includes('git') && !str.includes('github')) return <SiGit size={size} color={customColor || '#f05032'} />;
+  if (str.includes('github')) return <FaGithub size={size} color={customColor || '#ffffff'} />;
+  if (str.includes('python')) return <SiPython size={size} color={customColor || '#3776ab'} />;
+  if (str.includes('java') && !str.includes('script')) return <FaJava size={size} color={customColor || '#f89820'} />;
+  if (str.includes('docker')) return <SiDocker size={size} color={customColor || '#2496ed'} />;
+  if (str.includes('firebase')) return <SiFirebase size={size} color={customColor || '#ffca28'} />;
+  if (str.includes('openai') || str.includes('gpt') || str.includes('llm') || str.includes('ai')) return <FaRobot size={size} color={customColor || '#10a37f'} />;
+  if (str.includes('voice') || str.includes('speech') || str.includes('audio')) return <FaMicrophone size={size} color={customColor || '#a855f7'} />;
+  if (str.includes('bootstrap')) return <SiBootstrap size={size} color={customColor || '#7952b3'} />;
+  if (str.includes('aws')) return <FaAws size={size} color={customColor || '#ff9900'} />;
+  if (str.includes('vite')) return <SiVite size={size} color={customColor || '#bd34fe'} />;
+  if (str.includes('database') || str.includes('db')) return <FaDatabase size={size} color={customColor || '#38bdf8'} />;
+  if (str.includes('api') || str.includes('backend') || str.includes('server')) return <FaServer size={size} color={customColor || '#34d399'} />;
+
+  return <FaCode size={size} color={customColor || '#38bdf8'} />;
 };
 
 const ProjectDetailPage = ({ projectId, onNavigate }) => {
@@ -48,22 +86,14 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
       const targetId = projectId || 'construction-management-system';
 
       try {
-        const res = await fetch(`/api/projects/${targetId}`);
+        const res = await fetch(apiUrl(`/api/projects/${targetId}`));
         const data = await res.json();
 
         if (res.ok && data.success && data.data) {
           setProject(data.data);
           setActiveImage(data.data.image || (data.data.gallery && data.data.gallery[0]?.full) || '');
         } else {
-          // Fallback to direct port 5000 if needed
-          const fallbackRes = await fetch(`http://localhost:5000/api/projects/${targetId}`);
-          const fallbackData = await fallbackRes.json();
-          if (fallbackRes.ok && fallbackData.success) {
-            setProject(fallbackData.data);
-            setActiveImage(fallbackData.data.image || '');
-          } else {
-            setError(data.message || 'Project not found');
-          }
+          setError(data.message || 'Project not found');
         }
       } catch (err) {
         console.error('Error loading project details:', err);
@@ -116,6 +146,90 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
       </div>
     );
   }
+
+  // Smart resolution for Tech Stack (handles empty arrays, tags fallback, string arrays)
+  const resolveTechStack = () => {
+    if (Array.isArray(project.techStack) && project.techStack.length > 0) {
+      return project.techStack.map(item => {
+        if (typeof item === 'string') {
+          return { name: item, icon: item };
+        }
+        return {
+          name: item.name || item.title || 'Tech',
+          icon: item.icon || item.name || 'Tech',
+          color: item.color
+        };
+      });
+    }
+
+    // Fallback: build from tags if techStack is empty
+    if (Array.isArray(project.tags) && project.tags.length > 0) {
+      return project.tags.map(tag => ({
+        name: tag,
+        icon: tag
+      }));
+    }
+
+    // Default fallback
+    return [
+      { name: 'React', icon: 'React' },
+      { name: 'Node.js', icon: 'Node.js' },
+      { name: 'JavaScript', icon: 'JavaScript' },
+      { name: 'REST APIs', icon: 'API' }
+    ];
+  };
+
+  // Smart resolution for Key Features (handles empty arrays, auto-extracts highlights)
+  const resolveFeatures = () => {
+    if (Array.isArray(project.features) && project.features.length > 0) {
+      return project.features;
+    }
+
+    // Check if description has bullet points or lines
+    const desc = project.fullDescription || project.shortDescription || '';
+    if (desc.includes('\n') || desc.includes('•') || desc.includes('- ')) {
+      const lines = desc
+        .split('\n')
+        .map(l => l.trim().replace(/^[-*•\d.]+\s*/, ''))
+        .filter(l => l.length > 15);
+      if (lines.length >= 2) {
+        return lines.slice(0, 6);
+      }
+    }
+
+    // Split descriptive sentences
+    const sentences = desc
+      .split(/(?<=[.!?])\s+/)
+      .map(s => s.trim())
+      .filter(s => s.length > 20);
+
+    if (sentences.length >= 2) {
+      return sentences.slice(0, 5);
+    }
+
+    // Smart contextual fallbacks tailored to project
+    const isAiOrVoice = (project.title + ' ' + desc).toLowerCase().includes('ai') || 
+                        (project.title + ' ' + desc).toLowerCase().includes('voice');
+
+    if (isAiOrVoice) {
+      return [
+        'AI-driven natural voice command interaction and intelligent response generation',
+        'Real-time health telemetry & vitals tracking with responsive analytics',
+        'Personalized smart recommendations and automated assistance workflows',
+        'Modern responsive web client designed for accessibility and speed'
+      ];
+    }
+
+    return [
+      'Interactive, responsive user interface built with modern component architecture',
+      'Optimized backend services with secure RESTful endpoints & data validation',
+      'Reliable database persistence with structured relational modeling',
+      'Clean modular codebase with high performance, scalability, and security'
+    ];
+  };
+
+  const finalTechStack = resolveTechStack();
+  const finalFeatures = resolveFeatures();
 
   return (
     <div className="project-detail-page">
@@ -177,7 +291,7 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
             </p>
 
             {/* Tags row */}
-            {project.tags && (
+            {project.tags && project.tags.length > 0 && (
               <div className="project-detail-tags">
                 {project.tags.map((tag, i) => (
                   <span key={i} className="detail-tag-pill">
@@ -189,15 +303,17 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
 
             {/* Action Buttons: Live Demo & View Code */}
             <div className="project-actions-row">
-              <a 
-                href={project.liveDemoUrl || '#'} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="btn-live-demo"
-              >
-                <span>Live Demo</span>
-                <span className="btn-arrow">&rarr;</span>
-              </a>
+              {project.liveDemoUrl && (
+                <a 
+                  href={project.liveDemoUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="btn-live-demo"
+                >
+                  <span>Live Demo</span>
+                  <span className="btn-arrow">&rarr;</span>
+                </a>
+              )}
 
               <a 
                 href={project.githubUrl || settings.github_url || 'https://github.com'} 
@@ -222,7 +338,7 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
             <h2 className="specs-section-title">Key Features</h2>
             
             <ul className="features-checklist">
-              {project.features && project.features.map((feat, idx) => (
+              {finalFeatures.map((feat, idx) => (
                 <li key={idx} className="feature-check-item">
                   <FaCheckCircle className="feature-check-icon" />
                   <span className="feature-check-text">{feat}</span>
@@ -236,10 +352,10 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
             <h2 className="specs-section-title coral-title">Tech Stack</h2>
             
             <div className="tech-stack-grid">
-              {project.techStack && project.techStack.map((tech, idx) => (
+              {finalTechStack.map((tech, idx) => (
                 <div key={idx} className="tech-badge-item">
                   <div className="tech-badge-icon">
-                    {renderTechIcon(tech.icon, tech.color)}
+                    {renderTechIcon(tech.icon || tech.name, tech.color)}
                   </div>
                   <span className="tech-badge-name">{tech.name}</span>
                 </div>

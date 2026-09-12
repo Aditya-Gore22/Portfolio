@@ -20,6 +20,7 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
     { id: 'projects', name: 'Projects', section: 'projects' },
     { id: 'skills', name: 'Skills', section: 'about' },
     { id: 'experience', name: 'Experience', section: 'about' },
+    { id: 'resume', name: 'Resume', section: 'resume' },
     { id: 'break', name: 'Take a Break', section: 'game' },
     { id: 'contact', name: 'Contact', section: 'contact' },
   ];
@@ -29,6 +30,8 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
     closeMenu();
     if (link.id === 'contact') {
       if (onNavigate) onNavigate('contact');
+    } else if (link.id === 'resume') {
+      if (onNavigate) onNavigate('resume');
     } else if (link.id === 'break') {
       if (onNavigate) onNavigate('game');
     } else {
@@ -67,11 +70,13 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
               const isActive = 
                 currentView === 'contact' 
                   ? link.id === 'contact' 
-                  : currentView === 'game'
-                    ? link.id === 'break'
-                    : currentView === 'project-detail'
-                      ? link.id === 'projects'
-                      : currentView === 'home' && link.id === 'home';
+                  : currentView === 'resume'
+                    ? link.id === 'resume'
+                    : currentView === 'game'
+                      ? link.id === 'break'
+                      : currentView === 'project-detail'
+                        ? link.id === 'projects'
+                        : currentView === 'home' && link.id === 'home';
               return (
                 <li key={link.name}>
                   <a 
@@ -89,7 +94,7 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
 
         <div className="nav-right">
           <a href="#contact" onClick={handleConnectClick} className="btn-connect">
-            Let's Connect
+            Let's Connect <span className="connect-arrow">↗</span>
           </a>
           <button className={`hamburger ${isMobileMenuOpen ? 'active' : ''}`} onClick={toggleMenu} aria-label="Toggle menu">
             <span className="bar"></span>
@@ -105,11 +110,13 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
             const isActive = 
               currentView === 'contact' 
                 ? link.id === 'contact' 
-                : currentView === 'game'
-                  ? link.id === 'break'
-                  : currentView === 'project-detail'
-                    ? link.id === 'projects'
-                    : currentView === 'home' && link.id === 'home';
+                : currentView === 'resume'
+                  ? link.id === 'resume'
+                  : currentView === 'game'
+                    ? link.id === 'break'
+                    : currentView === 'project-detail'
+                      ? link.id === 'projects'
+                      : currentView === 'home' && link.id === 'home';
             return (
               <li key={link.name}>
                 <a 
@@ -124,7 +131,7 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
           })}
           <li>
             <a href="#contact" onClick={handleConnectClick} className="btn-connect-mobile">
-              Let's Connect
+              Let's Connect ↗
             </a>
           </li>
         </ul>
