@@ -38,7 +38,7 @@ import {
 } from 'react-icons/fa';
 import { MdDashboard, MdOutlineMarkEmailRead } from 'react-icons/md';
 import { useSettings } from '../../context/SettingsContext.jsx';
-import { apiUrl } from '../../utils/api';
+import { apiUrl, resolveImageUrl } from '../../utils/api';
 
 const AdminDashboard = ({ onNavigate }) => {
   const { updateSettings: updateContextSettings, refreshSettings } = useSettings();
@@ -427,28 +427,81 @@ const AdminDashboard = ({ onNavigate }) => {
   };
 
   // ================= MULTIPART IMAGE UPLOAD =================
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1200;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // WebP format gives 30% smaller size than JPEG with high quality
+          const dataUrl = canvas.toDataURL('image/webp', 0.82);
+          resolve(dataUrl);
+        };
+        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageFileChange = async (e) => {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('image', file);
     setUploadingImage(true);
     setUploadError('');
 
     try {
+      // 1. Instant client-side optimized preview
+      const compressedDataUrl = await compressImage(file);
+      if (compressedDataUrl) {
+        setProjectForm(prev => ({ ...prev, image: compressedDataUrl }));
+      }
+
+      // 2. Also try uploading to server
+      const formData = new FormData();
+      formData.append('image', file);
+
       const res = await authFetch('/api/upload', {
         method: 'POST',
         body: formData
       });
-      const data = await res.json();
-      if (data.success && data.imageUrl) {
-        setProjectForm(prev => ({ ...prev, image: data.imageUrl }));
-      } else {
-        setUploadError(data.message || 'Image upload failed.');
+
+      if (res.ok) {
+        const data = await res.json();
+        // If upload succeeds and file is smaller than base64, we can keep either
+        if (data.success && data.imageUrl) {
+          // If in local dev or backend has persistent storage, use imageUrl
+          // But if on free cloud (ephemeral disk), base64 in MySQL is much safer!
+          if (!data.imageUrl.startsWith('/uploads/')) {
+            setProjectForm(prev => ({ ...prev, image: data.imageUrl }));
+          }
+        }
       }
     } catch (err) {
-      setUploadError('Failed to upload image. Please check image format.');
+      // If server upload failed (e.g. timeout or sleeping), the compressed base64 still works!
+      console.warn('Server upload note:', err);
     } finally {
       setUploadingImage(false);
     }
@@ -1461,7 +1514,7 @@ const AdminDashboard = ({ onNavigate }) => {
                     {projects.slice(0, 3).map(proj => (
                       <div key={proj.id} className="recent-project-item">
                         <img 
-                          src={proj.image || '/images/02_construction_project.png'} 
+                          src={resolveImageUrl(proj.image)} 
                           alt={proj.title} 
                           className="project-thumb-img" 
                         />
@@ -1714,7 +1767,7 @@ const AdminDashboard = ({ onNavigate }) => {
               <div className="projects-grid-manage">
                 {projects.map(proj => (
                   <div key={proj.id} className="project-manage-card">
-                    <img src={proj.image || '/images/02_construction_project.png'} alt={proj.title} className="manage-card-img" />
+                    <img src={resolveImageUrl(proj.image)} alt={proj.title} className="manage-card-img" />
                     <div className="manage-card-body">
                       <div className="card-top-status">
                         <span className={`pill-badge ${proj.published ? 'published' : 'draft'}`}>
@@ -2708,7 +2761,7 @@ const AdminDashboard = ({ onNavigate }) => {
                 <div className="upload-interactive-area">
                   <div className="upload-preview-box">
                     {projectForm.image ? (
-                      <img src={projectForm.image} alt="Preview" className="upload-thumb-preview" />
+                      <img src={resolveImageUrl(projectForm.image)} alt="Preview" className="upload-thumb-preview" />
                     ) : (
                       <div className="upload-empty-placeholder">No Image</div>
                     )}

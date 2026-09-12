@@ -107,7 +107,7 @@ export async function initDatabase() {
         title VARCHAR(255) NOT NULL,
         shortDescription TEXT,
         fullDescription TEXT,
-        image VARCHAR(500),
+        image LONGTEXT,
         category VARCHAR(100) DEFAULT 'Full Stack',
         tags JSON,
         gallery JSON,
@@ -121,6 +121,13 @@ export async function initDatabase() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // Ensure projects.image is LONGTEXT (for base64 or long image URLs)
+    try {
+      await pool.query("ALTER TABLE projects MODIFY COLUMN image LONGTEXT");
+    } catch (e) {
+      // safe to ignore
+    }
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS messages (

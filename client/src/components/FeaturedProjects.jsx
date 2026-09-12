@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiExternalLink } from 'react-icons/fi';
 import './FeaturedProjects.css';
-import { apiUrl } from '../utils/api';
+import { apiUrl, resolveImageUrl } from '../utils/api';
 
 const FeaturedProjects = ({ onSelectProject }) => {
   const [projects, setProjects] = useState([]);
@@ -69,7 +69,7 @@ const FeaturedProjects = ({ onSelectProject }) => {
             >
               <div className="project-image-container">
                 <img 
-                  src={project.image || '/images/02_construction_project.png'} 
+                  src={resolveImageUrl(project.image)} 
                   alt={project.title} 
                   className="project-image" 
                 />
