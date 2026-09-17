@@ -125,20 +125,26 @@
 }
 
 .char-badge-avatar {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: inline-block;
+  background-size: cover;
+  background-position: center top;
+  image-rendering: pixelated;
+  flex-shrink: 0;
 }
 
 .char-badge-avatar.male-mini {
-  background: #2563eb;
+  background-color: #1e3a8a;
+  background-image: url('/images/aditya_avatar.png');
   border: 1.5px solid #60a5fa;
-  box-shadow: 0 0 4px #2563eb;
+  box-shadow: 0 0 5px rgba(37, 99, 235, 0.7);
 }
 
 .char-badge-avatar.female-mini {
-  background: #dc2626;
+  background-color: #7f1d1d;
+  background-image: url('/images/maya_avatar.png');
   border: 1.5px solid #f87171;
   box-shadow: 0 0 5px rgba(220, 38, 38, 0.8);
 }
