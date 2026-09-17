@@ -12,6 +12,8 @@ const Footer = ({ onNavigate }) => {
       if (onNavigate) onNavigate('contact');
     } else if (section === 'resume') {
       if (onNavigate) onNavigate('resume');
+    } else if (section === 'projects') {
+      if (onNavigate) onNavigate('projects');
     } else {
       if (onNavigate) onNavigate('home', section);
     }
