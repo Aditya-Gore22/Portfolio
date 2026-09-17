@@ -209,6 +209,9 @@ const AllProjectsPage = ({ onSelectProject, onNavigate }) => {
 
   return (
     <div className="all-projects-page">
+      {/* Mobile Ambient Background Backdrop */}
+      <div className="all-projects-bg-backdrop" aria-hidden="true"></div>
+
       {/* Hero Header Section */}
       <section className="all-projects-hero">
         <div className="hero-bg-overlay"></div>
@@ -255,9 +258,12 @@ const AllProjectsPage = ({ onSelectProject, onNavigate }) => {
                 ref={searchInputRef}
                 type="text"
                 className="search-input"
-                placeholder="Search projects (e.g. React, Node, AI...)"
+                placeholder="Search projects (e.g. React, AI)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
               />
               {searchQuery && (
                 <button 
