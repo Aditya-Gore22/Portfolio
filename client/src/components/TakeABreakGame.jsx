@@ -1466,53 +1466,6 @@ const TakeABreakGame = ({ onNavigate }) => {
         <div className="canvas-container">
           <canvas ref={canvasRef} className="pixel-game-canvas" />
 
-          {/* ── Mobile Touch Controls (hidden on desktop via CSS) ── */}
-          <div className="mobile-controls" aria-label="Mobile game controls">
-            {/* Left cluster: ← ↓ → */}
-            <div className="mobile-dpad">
-              <button
-                type="button"
-                className="dpad-btn dpad-left"
-                aria-label="Move left"
-                onPointerDown={() => { keysRef.current.left = true; }}
-                onPointerUp={() => { keysRef.current.left = false; }}
-                onPointerLeave={() => { keysRef.current.left = false; }}
-              >◀</button>
-              <button
-                type="button"
-                className="dpad-btn dpad-down"
-                aria-label="Duck"
-                onPointerDown={() => { keysRef.current.down = true; }}
-                onPointerUp={() => { keysRef.current.down = false; }}
-                onPointerLeave={() => { keysRef.current.down = false; }}
-              >▼</button>
-              <button
-                type="button"
-                className="dpad-btn dpad-right"
-                aria-label="Move right"
-                onPointerDown={() => { keysRef.current.right = true; }}
-                onPointerUp={() => { keysRef.current.right = false; }}
-                onPointerLeave={() => { keysRef.current.right = false; }}
-              >▶</button>
-            </div>
-
-            {/* Right cluster: JUMP */}
-            <div className="mobile-action-cluster">
-              <button
-                type="button"
-                className="dpad-btn dpad-jump"
-                aria-label="Jump"
-                onPointerDown={() => {
-                  // Trigger the live jump function exposed by the game loop
-                  if (canvasRef.current?._triggerJump) canvasRef.current._triggerJump();
-                  keysRef.current.up = true;
-                }}
-                onPointerUp={() => { keysRef.current.up = false; }}
-                onPointerLeave={() => { keysRef.current.up = false; }}
-              >▲<span className="jump-label">JUMP</span></button>
-            </div>
-          </div>
-
           {/* Victory Overlay Modal */}
           {gameState === 'won' && (
             <div className="game-modal-overlay">
@@ -1562,6 +1515,58 @@ const TakeABreakGame = ({ onNavigate }) => {
               </div>
             </div>
           )}
+        </div>{/* end canvas-container */}
+
+        {/* ── Mobile Touch Controls (standalone, below canvas, hidden on desktop) ── */}
+        <div className="mobile-controls" aria-label="Mobile game controls">
+          {/* Left cluster: ← ↓ → */}
+          <div className="mobile-dpad">
+            <button
+              type="button"
+              className="dpad-btn dpad-left"
+              aria-label="Move left"
+              onPointerDown={() => { keysRef.current.left = true; }}
+              onPointerUp={() => { keysRef.current.left = false; }}
+              onPointerLeave={() => { keysRef.current.left = false; }}
+            >◀</button>
+            <button
+              type="button"
+              className="dpad-btn dpad-down"
+              aria-label="Duck"
+              onPointerDown={() => { keysRef.current.down = true; }}
+              onPointerUp={() => { keysRef.current.down = false; }}
+              onPointerLeave={() => { keysRef.current.down = false; }}
+            >▼</button>
+            <button
+              type="button"
+              className="dpad-btn dpad-right"
+              aria-label="Move right"
+              onPointerDown={() => { keysRef.current.right = true; }}
+              onPointerUp={() => { keysRef.current.right = false; }}
+              onPointerLeave={() => { keysRef.current.right = false; }}
+            >▶</button>
+          </div>
+
+          {/* Centre label */}
+          <div className="mobile-controls-label">
+            <span>◀ MOVE ▶</span>
+            <span>▼ DUCK</span>
+          </div>
+
+          {/* Right cluster: JUMP */}
+          <div className="mobile-action-cluster">
+            <button
+              type="button"
+              className="dpad-btn dpad-jump"
+              aria-label="Jump"
+              onPointerDown={() => {
+                if (canvasRef.current?._triggerJump) canvasRef.current._triggerJump();
+                keysRef.current.up = true;
+              }}
+              onPointerUp={() => { keysRef.current.up = false; }}
+              onPointerLeave={() => { keysRef.current.up = false; }}
+            >▲<span className="jump-label">JUMP</span></button>
+          </div>
         </div>
 
         {/* BOTTOM HUD SECTION */}
