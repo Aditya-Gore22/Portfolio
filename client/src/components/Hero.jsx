@@ -1,7 +1,17 @@
 import React from 'react';
 import './Hero.css';
 
-const Hero = () => {
+const Hero = ({ onNavigate }) => {
+  const handleViewWork = (e) => {
+    e.preventDefault();
+    const el = document.getElementById('projects') || document.getElementById('work');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else if (onNavigate) {
+      onNavigate('home', 'projects');
+    }
+  };
+
   return (
     <section className="hero-section" id="home">
       <div className="hero-overlay"></div>
@@ -17,7 +27,7 @@ const Hero = () => {
             A developer who loves building things<br />
             and playing games.
           </p>
-          <a href="#work" className="hero-btn">
+          <a href="#projects" onClick={handleViewWork} className="hero-btn">
             VIEW MY WORK &rarr;
           </a>
           <div className="hero-breadcrumb">

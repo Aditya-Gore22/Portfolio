@@ -144,7 +144,7 @@ function App() {
         </main>
       ) : (
         <main>
-          <Hero />
+          <Hero onNavigate={handleNavigate} />
           <FeaturedProjects onSelectProject={handleSelectProject} />
           <AboutSkillsAchievements />
           <ContactCTA onNavigate={handleNavigate} />
