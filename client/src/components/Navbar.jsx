@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FiSearch } from 'react-icons/fi';
 import './Navbar.css';
 
 const Navbar = ({ currentView = 'home', onNavigate }) => {
@@ -34,6 +35,8 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
       if (onNavigate) onNavigate('resume');
     } else if (link.id === 'break') {
       if (onNavigate) onNavigate('game');
+    } else if (link.id === 'projects') {
+      if (onNavigate) onNavigate('projects');
     } else {
       if (onNavigate) onNavigate('home', link.section);
     }
@@ -74,7 +77,7 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
                     ? link.id === 'resume'
                     : currentView === 'game'
                       ? link.id === 'break'
-                      : currentView === 'project-detail'
+                      : (currentView === 'projects' || currentView === 'project-detail')
                         ? link.id === 'projects'
                         : currentView === 'home' && link.id === 'home';
               return (
@@ -93,6 +96,17 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
         </nav>
 
         <div className="nav-right">
+          <button 
+            type="button" 
+            className="nav-search-btn" 
+            onClick={() => {
+              if (onNavigate) onNavigate('projects');
+            }}
+            title="Search projects"
+            aria-label="Search projects"
+          >
+            <FiSearch />
+          </button>
           <a href="#contact" onClick={handleConnectClick} className="btn-connect">
             Let's Connect <span className="connect-arrow">↗</span>
           </a>
@@ -114,7 +128,7 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
                   ? link.id === 'resume'
                   : currentView === 'game'
                     ? link.id === 'break'
-                    : currentView === 'project-detail'
+                    : (currentView === 'projects' || currentView === 'project-detail')
                       ? link.id === 'projects'
                       : currentView === 'home' && link.id === 'home';
             return (

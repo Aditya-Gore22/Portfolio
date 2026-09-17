@@ -3,7 +3,7 @@ import { FiExternalLink } from 'react-icons/fi';
 import './FeaturedProjects.css';
 import { apiUrl, resolveImageUrl } from '../utils/api';
 
-const FeaturedProjects = ({ onSelectProject }) => {
+const FeaturedProjects = ({ onSelectProject, onNavigate }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +47,13 @@ const FeaturedProjects = ({ onSelectProject }) => {
           <button 
             type="button" 
             className="view-all-link"
-            onClick={() => handleCardClick(projects[0]?.id || 'construction-management-system')}
+            onClick={() => {
+              if (onNavigate) {
+                onNavigate('projects');
+              } else if (onSelectProject && projects.length > 0) {
+                handleCardClick(projects[0].id);
+              }
+            }}
           >
             View All Projects &rarr;
           </button>

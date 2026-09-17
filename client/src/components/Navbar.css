@@ -134,6 +134,26 @@ body {
 .nav-right {
   display: flex;
   align-items: center;
+  gap: 14px;
+}
+
+.nav-search-btn {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.nav-search-btn:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
 }
 
 .btn-connect {

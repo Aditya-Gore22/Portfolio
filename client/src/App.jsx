@@ -7,6 +7,7 @@ import ContactCTA from './components/ContactCTA';
 import ContactPage from './components/ContactPage';
 import ResumePage from './components/ResumePage';
 import ProjectDetailPage from './components/ProjectDetailPage';
+import AllProjectsPage from './components/AllProjectsPage';
 import TakeABreakGame from './components/TakeABreakGame';
 import AdminDashboard from './components/admin/AdminDashboard';
 import Footer from './components/Footer';
@@ -19,6 +20,7 @@ function App() {
     if (hash === '#contact') return 'contact';
     if (hash === '#resume') return 'resume';
     if (hash === '#game' || hash === '#take-a-break') return 'game';
+    if (hash === '#projects' || hash === '#all-projects') return 'projects';
     if (hash.startsWith('#project/')) return 'project-detail';
     return 'home';
   });
@@ -45,6 +47,9 @@ function App() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (hash === '#game' || hash === '#take-a-break') {
         setCurrentView('game');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (hash === '#projects' || hash === '#all-projects') {
+        setCurrentView('projects');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (hash.startsWith('#project/')) {
         const id = hash.replace('#project/', '');
@@ -80,6 +85,10 @@ function App() {
     } else if (view === 'game') {
       setCurrentView('game');
       window.location.hash = 'game';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (view === 'projects') {
+      setCurrentView('projects');
+      window.location.hash = 'projects';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (view === 'project-detail') {
       setCurrentView('project-detail');
@@ -135,6 +144,13 @@ function App() {
         <main>
           <TakeABreakGame onNavigate={handleNavigate} />
         </main>
+      ) : currentView === 'projects' ? (
+        <main>
+          <AllProjectsPage 
+            onSelectProject={handleSelectProject} 
+            onNavigate={handleNavigate} 
+          />
+        </main>
       ) : currentView === 'project-detail' ? (
         <main>
           <ProjectDetailPage 
@@ -145,7 +161,7 @@ function App() {
       ) : (
         <main>
           <Hero onNavigate={handleNavigate} />
-          <FeaturedProjects onSelectProject={handleSelectProject} />
+          <FeaturedProjects onSelectProject={handleSelectProject} onNavigate={handleNavigate} />
           <AboutSkillsAchievements />
           <ContactCTA onNavigate={handleNavigate} />
         </main>

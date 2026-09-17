@@ -127,7 +127,7 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
           <button 
             type="button" 
             className="back-to-projects-btn" 
-            onClick={() => onNavigate('home', 'projects')}
+            onClick={() => onNavigate ? onNavigate('projects') : window.history.back()}
           >
             <FaArrowLeft /> Back to Projects
           </button>
@@ -137,9 +137,9 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
             <button 
               type="button" 
               className="error-return-btn" 
-              onClick={() => onNavigate('home', 'projects')}
+              onClick={() => onNavigate ? onNavigate('projects') : window.history.back()}
             >
-              Return to Featured Projects
+              Return to All Projects
             </button>
           </div>
         </div>
@@ -239,7 +239,7 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
         <button 
           type="button" 
           className="back-to-projects-btn"
-          onClick={() => onNavigate('home', 'projects')}
+          onClick={() => onNavigate ? onNavigate('projects') : window.history.back()}
         >
           <FaArrowLeft className="back-arrow-icon" />
           <span>Back to Projects</span>
