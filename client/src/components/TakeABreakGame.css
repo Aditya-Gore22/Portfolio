@@ -517,87 +517,15 @@
   box-shadow: 0 0 12px rgba(236, 72, 153, 0.4);
 }
 
-/* Custom CSS Pixel Portraits */
-.pixel-portrait {
-  width: 44px;
-  height: 50px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.portrait-face {
-  width: 24px;
-  height: 20px;
-  background: #fed7aa;
-  border-radius: 3px;
-  position: relative;
-  margin-top: 10px;
-  box-shadow: 0 1px 0 #ea580c;
-}
-
-.portrait-eye {
-  width: 4px;
-  height: 5px;
-  background: #0f172a;
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  box-shadow: 1px 1px 0 #ffffff;
-}
-
-.portrait-eye.cyan-glint {
-  background: #06b6d4;
-  box-shadow: 1px 1px 0 #ffffff, 0 0 4px #06b6d4;
-}
-
-.portrait-blush {
-  width: 4px;
-  height: 3px;
-  background: #f472b6;
-  position: absolute;
-  top: 11px;
-  right: 4px;
-  border-radius: 2px;
-}
-
-.portrait-hair {
-  position: absolute;
-  top: 2px;
-  width: 30px;
-  height: 16px;
-  z-index: 2;
-}
-
-.portrait-hair.male-hair {
-  background: #592708;
-  border-radius: 6px 6px 0 0;
-  box-shadow: 0 -2px 0 #92400e;
-}
-
-.portrait-hair.female-hair {
-  background: #7e22ce;
-  border-radius: 6px 6px 0 0;
-  box-shadow: -4px 4px 0 #a855f7;
-}
-
-.portrait-body {
-  width: 32px;
-  height: 18px;
-  border-radius: 4px 4px 0 0;
-  margin-top: -2px;
-  z-index: 1;
-}
-
-.portrait-body.male-hoodie {
-  background: #2563eb;
-  border-top: 2px solid #ffffff;
-}
-
-.portrait-body.female-jacket {
-  background: #9333ea;
-  border-top: 2px solid #ec4899;
+/* High-Definition Pixel-Art Canvas Avatar */
+.pixel-avatar-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  border-radius: 6px;
 }
 
 .dialogue-content {
