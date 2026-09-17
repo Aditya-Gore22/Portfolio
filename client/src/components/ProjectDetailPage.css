@@ -407,3 +407,17 @@
     justify-content: center;
   }
 }
+
+@media (max-width: 480px) {
+  .project-detail-title {
+    font-size: 1.3rem;
+  }
+
+  .tech-stack-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .specs-section-title {
+    font-size: 1.15rem;
+  }
+}

@@ -301,25 +301,56 @@
   }
 }
 
+@media (max-width: 768px) {
+  .asa-section {
+    padding: 50px 0;
+  }
+
+  .asa-container {
+    padding: 0 18px;
+  }
+
+  .asa-grid {
+    gap: 20px;
+  }
+
+  .asa-card-panel {
+    padding: 16px 16px 14px;
+    border-radius: 12px;
+  }
+
+  .asa-card-title {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+  }
+}
+
 @media (max-width: 540px) {
   .asa-about-body {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    gap: 10px;
+  }
+
+  .asa-about-char {
+    width: 65px;
   }
 
   .asa-card-header {
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
   }
 
   .asa-skills-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
   }
 
   .asa-about-quote-text {
-    font-size: 0.54rem;
+    font-size: 0.52rem;
     text-align: center;
+    line-height: 1.6;
   }
 }
 
