@@ -1,0 +1,500 @@
+/* ==========================================================================
+   GAME LOADER COMPONENT STYLES
+   Aesthetic: Cyberpunk Arcade HUD, Levitating Controller, Retro XP Bar
+   ========================================================================== */
+
+.game-loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 40px 16px;
+  position: relative;
+  z-index: 10;
+}
+
+.game-loader-container.game-loader-fullpage {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10, 14, 26, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   HUD Frame with Sci-Fi Brackets
+   -------------------------------------------------------------------------- */
+.game-loader-hud-frame {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  background: rgba(13, 19, 34, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 36px 32px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(56, 189, 248, 0.12),
+    inset 0 0 20px rgba(168, 85, 247, 0.06);
+  overflow: hidden;
+}
+
+/* Sci-Fi Corner Accents */
+.hud-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: #38bdf8;
+  pointer-events: none;
+}
+
+.hud-corner.top-left {
+  top: 6px;
+  left: 6px;
+  border-top: 2px solid #38bdf8;
+  border-left: 2px solid #38bdf8;
+}
+
+.hud-corner.top-right {
+  top: 6px;
+  right: 6px;
+  border-top: 2px solid #a855f7;
+  border-right: 2px solid #a855f7;
+}
+
+.hud-corner.bottom-left {
+  bottom: 6px;
+  left: 6px;
+  border-bottom: 2px solid #38bdf8;
+  border-left: 2px solid #38bdf8;
+}
+
+.hud-corner.bottom-right {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 2px solid #a855f7;
+  border-right: 2px solid #a855f7;
+}
+
+/* Scanlines overlay */
+.game-loader-scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   Levitating Controller Visual
+   -------------------------------------------------------------------------- */
+.game-loader-visual {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.controller-glow-wrap {
+  position: relative;
+  z-index: 3;
+  width: 62px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: levitate-gamepad 2.8s ease-in-out infinite;
+}
+
+.loader-gamepad-icon {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.8))
+          drop-shadow(0 0 24px rgba(168, 85, 247, 0.6));
+}
+
+@keyframes levitate-gamepad {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(4px) rotate(3deg);
+  }
+}
+
+/* Radar Pulse Rings */
+.pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid;
+  pointer-events: none;
+  opacity: 0;
+  animation: ring-pulse 2.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.pulse-ring.ring-1 {
+  border-color: rgba(56, 189, 248, 0.7);
+  animation-delay: 0s;
+}
+
+.pulse-ring.ring-2 {
+  border-color: rgba(168, 85, 247, 0.7);
+  animation-delay: 0.9s;
+}
+
+.pulse-ring.ring-3 {
+  border-color: rgba(34, 197, 94, 0.6);
+  animation-delay: 1.8s;
+}
+
+@keyframes ring-pulse {
+  0% {
+    width: 30px;
+    height: 30px;
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    width: 125px;
+    height: 125px;
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* Orbiting Particles */
+.orbiting-particle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orbiting-particle.particle-cyan {
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8;
+  animation: orbit-circle 2.2s linear infinite;
+}
+
+.orbiting-particle.particle-purple {
+  background: #c084fc;
+  box-shadow: 0 0 10px #c084fc, 0 0 20px #c084fc;
+  animation: orbit-circle 2.2s linear infinite reverse;
+}
+
+@keyframes orbit-circle {
+  0% {
+    transform: rotate(0deg) translateX(46px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(46px) rotate(-360deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   HUD Status & Typography
+   -------------------------------------------------------------------------- */
+.game-loader-status {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.hud-prefix-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.status-badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.status-badge-live::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+.hud-system-text {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: #64748b;
+  letter-spacing: 1.5px;
+}
+
+.loader-pixel-title {
+  font-family: var(--font-pixel, 'Press Start 2P', monospace);
+  font-size: 0.98rem;
+  line-height: 1.45;
+  color: #ffffff;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+  text-shadow: 
+    0 0 10px rgba(56, 189, 248, 0.6),
+    0 0 20px rgba(168, 85, 247, 0.4);
+}
+
+.blinking-cursor {
+  color: #38bdf8;
+  animation: blink 0.9s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.loader-subtitle {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem;
+  color: #94a3b8;
+  margin-bottom: 22px;
+}
+
+/* --------------------------------------------------------------------------
+   Retro Segmented XP / Progress Bar
+   -------------------------------------------------------------------------- */
+.cyber-progress-wrapper {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(10, 14, 26, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+
+.cyber-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  color: #38bdf8;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.progress-value {
+  color: #c084fc;
+  font-weight: 600;
+}
+
+.cyber-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.cyber-progress-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    #38bdf8 0%, 
+    #818cf8 35%, 
+    #c084fc 70%, 
+    #22c55e 100%
+  );
+  position: relative;
+  animation: cyber-bar-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes cyber-bar-pulse {
+  0% { transform: scaleX(0.2); transform-origin: left; }
+  50% { transform: scaleX(0.85); transform-origin: left; }
+  100% { transform: scaleX(0.98); transform-origin: left; }
+}
+
+.progress-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.8) 50%, 
+    transparent 100%
+  );
+  animation: shimmer-swipe 1.4s infinite;
+}
+
+@keyframes shimmer-swipe {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.cyber-progress-segments {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+.segment-block {
+  flex: 1;
+  height: 3px;
+  background: rgba(56, 189, 248, 0.2);
+  border-radius: 1px;
+  animation: segment-glow 1.5s infinite alternate;
+}
+
+@keyframes segment-glow {
+  0% { background: rgba(56, 189, 248, 0.15); }
+  100% { background: #38bdf8; box-shadow: 0 0 6px #38bdf8; }
+}
+
+/* --------------------------------------------------------------------------
+   Gamer Tip Dialogue Box
+   -------------------------------------------------------------------------- */
+.gamer-tip-box {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(20, 27, 45, 0.7);
+  border: 1px dashed rgba(168, 85, 247, 0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.tip-badge {
+  background: rgba(168, 85, 247, 0.18);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.tip-content {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin: 0;
+  animation: fade-tip 0.4s ease;
+}
+
+@keyframes fade-tip {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Responsive Adjustments
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .game-loader-container {
+    padding: 24px 12px;
+  }
+
+  .game-loader-hud-frame {
+    padding: 26px 18px 22px;
+    border-radius: 14px;
+  }
+
+  .game-loader-visual {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 18px;
+  }
+
+  .loader-gamepad-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .loader-pixel-title {
+    font-size: 0.84rem;
+    letter-spacing: 1px;
+  }
+
+  .loader-subtitle {
+    font-size: 0.76rem;
+    margin-bottom: 16px;
+  }
+
+  .cyber-progress-wrapper {
+    padding: 10px 12px;
+    margin-bottom: 16px;
+  }
+
+  .gamer-tip-box {
+    padding: 8px 10px;
+  }
+
+  .tip-content {
+    font-size: 0.72rem;
+  }
+}

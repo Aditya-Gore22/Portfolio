@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiExternalLink } from 'react-icons/fi';
 import './FeaturedProjects.css';
+import GameLoader from './GameLoader';
 import { apiUrl, resolveImageUrl } from '../utils/api';
 
 const FeaturedProjects = ({ onSelectProject, onNavigate }) => {
@@ -59,13 +60,20 @@ const FeaturedProjects = ({ onSelectProject, onNavigate }) => {
           </button>
         </div>
 
-        <div className="projects-grid">
-          {projects.length === 0 && !loading && (
-            <div style={{ color: '#94a3b8', textAlign: 'center', padding: '40px 0', gridColumn: '1 / -1', fontFamily: 'var(--font-mono, monospace)' }}>
-              No projects published yet.
-            </div>
-          )}
-          {projects.map((project) => (
+        {loading ? (
+          <GameLoader 
+            message="INITIALIZING FEATURED MISSIONS..." 
+            subtitle="Fetching top projects and tech stacks from MySQL..." 
+            minHeight="320px"
+          />
+        ) : (
+          <div className="projects-grid">
+            {projects.length === 0 && (
+              <div style={{ color: '#94a3b8', textAlign: 'center', padding: '40px 0', gridColumn: '1 / -1', fontFamily: 'var(--font-mono, monospace)' }}>
+                No projects published yet.
+              </div>
+            )}
+            {projects.map((project) => (
             <div 
               className="project-card" 
               key={project.id}
@@ -101,6 +109,7 @@ const FeaturedProjects = ({ onSelectProject, onNavigate }) => {
             </div>
           ))}
         </div>
+      )}
       </div>
     </section>
   );
