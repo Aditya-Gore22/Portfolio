@@ -191,13 +191,54 @@
 }
 
 @media (max-width: 768px) {
+  .featured-projects-section {
+    padding: 50px 0;
+  }
+
+  .projects-container {
+    padding: 0 18px;
+  }
+
   .projects-header-wrapper {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .projects-title {
+    font-size: 0.88rem;
+    gap: 8px;
+  }
+
+  .gamepad-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .projects-subtitle {
+    font-size: 0.88rem;
   }
 
   .projects-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .project-image-container {
+    height: 180px;
+  }
+
+  .project-content {
+    padding: 16px;
+  }
+
+  .project-card-title {
+    font-size: 1.15rem;
+  }
+
+  .project-description {
+    font-size: 0.88rem;
+    margin-bottom: 16px;
   }
 }

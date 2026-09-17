@@ -676,10 +676,38 @@
   }
 
   .contact-main-heading {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+    line-height: 1.35;
   }
 
   .pixel-section-title {
     font-size: 0.8rem;
+  }
+
+  .contact-form-input,
+  .contact-form-textarea {
+    font-size: 16px; /* Prevents auto-zoom on iOS Safari */
+  }
+
+  .contact-room-image {
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-container {
+    padding: 12px 14px 36px;
+  }
+
+  .contact-main-heading {
+    font-size: 1.15rem;
+  }
+
+  .contact-form-card {
+    padding: 18px 14px;
+  }
+
+  .contact-room-image {
+    max-height: 180px;
   }
 }

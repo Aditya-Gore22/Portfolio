@@ -1148,11 +1148,12 @@
 
 @media (max-width: 768px) {
   .resume-page {
-    padding: 90px 16px 60px;
+    padding: 80px 14px 50px;
   }
 
   .resume-main-title {
-    font-size: 2.1rem;
+    font-size: 1.6rem;
+    line-height: 1.25;
   }
 
   .doc-two-column {
@@ -1161,7 +1162,8 @@
   }
 
   .resume-sheet {
-    padding: 22px 18px;
+    padding: 18px 14px;
+    overflow-x: auto;
   }
 
   .doc-header {
@@ -1181,6 +1183,7 @@
   .viewer-toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .toolbar-center {
@@ -1189,6 +1192,16 @@
 
   .resume-stats-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .resume-main-title {
+    font-size: 1.3rem;
+  }
+
+  .resume-top-quote-text {
+    font-size: 0.72rem;
   }
 }
 
