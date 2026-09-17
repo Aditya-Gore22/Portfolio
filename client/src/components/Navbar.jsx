@@ -52,7 +52,7 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
   };
 
   return (
-    <header className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`}>
+    <header className={`navbar ${scrolled ? 'navbar-scrolled' : ''} ${currentView !== 'home' ? 'navbar-solid' : ''} ${isMobileMenuOpen ? 'navbar-open' : ''}`}>
       <div className="navbar-container">
         <a href="#home" onClick={handleLogoClick} className="logo-area">
           <div className="logo-icon-wrapper">
