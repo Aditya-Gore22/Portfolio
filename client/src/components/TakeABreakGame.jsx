@@ -534,6 +534,400 @@ function drawDetailedBug(ctx, bug, tick) {
   ctx.restore();
 }
 
+// ==========================================
+// HIGH-DEFINITION DIALOGUE PORTRAIT RENDERERS (64x64 Pixel Art)
+// ==========================================
+
+function drawMalePortrait(ctx) {
+  // 1. Dark cyber vignette background with glowing radial aura
+  ctx.fillStyle = '#060d1f';
+  ctx.fillRect(0, 0, 64, 64);
+  
+  const bgGrad = ctx.createRadialGradient(32, 28, 2, 32, 28, 28);
+  bgGrad.addColorStop(0, 'rgba(56, 189, 248, 0.32)');
+  bgGrad.addColorStop(0.6, 'rgba(37, 99, 235, 0.14)');
+  bgGrad.addColorStop(1, 'rgba(6, 13, 31, 0)');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, 64, 64);
+
+  // Subtle retro scanline texture
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+  for (let y = 0; y < 64; y += 2) {
+    ctx.fillRect(0, y, 64, 1);
+  }
+
+  // 2. Shoulders & Blue Cyber Hoodie
+  ctx.fillStyle = '#172554';
+  ctx.fillRect(6, 48, 52, 16);
+  ctx.fillStyle = '#1d4ed8';
+  ctx.fillRect(8, 46, 48, 18);
+  ctx.fillStyle = '#2563eb';
+  ctx.fillRect(10, 48, 44, 16);
+
+  // Hoodie fold highlights
+  ctx.fillStyle = '#3b82f6';
+  ctx.fillRect(10, 50, 4, 14);
+  ctx.fillRect(50, 50, 4, 14);
+  ctx.fillRect(16, 56, 6, 8);
+  ctx.fillRect(42, 56, 6, 8);
+
+  // Amber backpack strap over chest
+  ctx.fillStyle = '#b45309';
+  ctx.fillRect(14, 46, 6, 18);
+  ctx.fillStyle = '#f59e0b';
+  ctx.fillRect(15, 46, 4, 18);
+  // Gold buckle
+  ctx.fillStyle = '#fef08a';
+  ctx.fillRect(14, 54, 6, 3);
+  ctx.fillStyle = '#78350f';
+  ctx.fillRect(16, 55, 2, 1);
+
+  // Hoodie collar & inner tee
+  ctx.fillStyle = '#1e3a8a';
+  ctx.fillRect(20, 43, 24, 7);
+  // White undershirt
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(24, 46, 16, 18);
+  ctx.fillStyle = '#e2e8f0';
+  ctx.fillRect(26, 48, 12, 16);
+
+  // Cyan code insignia on chest </>
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillRect(28, 52, 8, 4);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(31, 52, 2, 4);
+
+  // 3. Neck & Chin
+  ctx.fillStyle = '#ea580c';
+  ctx.fillRect(26, 39, 12, 6);
+  ctx.fillStyle = '#fba97b';
+  ctx.fillRect(27, 38, 10, 6);
+
+  // 4. Face Base & Jaw
+  ctx.fillStyle = '#fba97b';
+  ctx.fillRect(22, 38, 20, 3);
+  ctx.fillStyle = '#fed7aa';
+  ctx.fillRect(20, 20, 24, 19);
+  ctx.fillRect(24, 39, 16, 2);
+  ctx.fillRect(27, 41, 10, 1);
+
+  // Right ear
+  ctx.fillStyle = '#fba97b';
+  ctx.fillRect(44, 27, 4, 8);
+  ctx.fillStyle = '#fed7aa';
+  ctx.fillRect(44, 28, 3, 6);
+
+  // 5. Gaming Headset (left earcup, headband, boom mic)
+  // Left Earcup
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(14, 24, 7, 12);
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(15, 25, 5, 10);
+  // Glowing cyan LED ring
+  ctx.fillStyle = '#0284c7';
+  ctx.fillRect(16, 27, 3, 6);
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillRect(17, 28, 1, 4);
+  // Headband arch
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(16, 12, 4, 13);
+  ctx.fillRect(18, 9, 6, 5);
+  ctx.fillRect(23, 7, 18, 4);
+  ctx.fillRect(40, 9, 6, 5);
+  ctx.fillRect(44, 13, 3, 6);
+  ctx.fillStyle = '#475569';
+  ctx.fillRect(24, 8, 16, 2);
+
+  // Boom mic with glowing cyan tip
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(18, 34, 3, 2);
+  ctx.fillRect(20, 36, 4, 2);
+  ctx.fillRect(23, 37, 5, 2);
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillRect(28, 36, 2, 3);
+  ctx.fillStyle = '#e0f2fe';
+  ctx.fillRect(29, 37, 1, 1);
+
+  // 6. Facial Features
+  // Cheeks warm blush
+  ctx.fillStyle = 'rgba(234, 88, 12, 0.2)';
+  ctx.fillRect(22, 32, 5, 3);
+  ctx.fillRect(37, 32, 5, 3);
+
+  // Nose shadow
+  ctx.fillStyle = '#ea580c';
+  ctx.fillRect(32, 32, 2, 3);
+  ctx.fillRect(31, 34, 3, 1);
+
+  // Confident Smirk / Smile
+  ctx.fillStyle = '#9a3412';
+  ctx.fillRect(28, 36, 8, 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(29, 36, 6, 1);
+
+  // Eyes
+  // Left Eye
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(24, 26, 6, 4);
+  ctx.fillStyle = '#0284c7';
+  ctx.fillRect(26, 26, 4, 4);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(27, 27, 2, 3);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(26, 26, 1, 2);
+  ctx.fillRect(27, 26, 1, 1);
+
+  // Right Eye
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(34, 26, 6, 4);
+  ctx.fillStyle = '#0284c7';
+  ctx.fillRect(36, 26, 4, 4);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(37, 27, 2, 3);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(36, 26, 1, 2);
+  ctx.fillRect(37, 26, 1, 1);
+
+  // Confident Angled Eyebrows
+  ctx.fillStyle = '#3d1604';
+  ctx.fillRect(23, 24, 7, 2);
+  ctx.fillRect(29, 25, 2, 1);
+  ctx.fillRect(34, 25, 2, 1);
+  ctx.fillRect(35, 24, 7, 2);
+
+  // 7. Layered Anime Spiky Brown Hair
+  ctx.fillStyle = '#291003';
+  ctx.fillRect(18, 10, 28, 12);
+  ctx.fillRect(19, 21, 3, 6);
+  ctx.fillRect(42, 21, 3, 6);
+
+  ctx.fillStyle = '#592708';
+  ctx.fillRect(20, 10, 24, 11);
+  // Spikes
+  ctx.fillRect(21, 6, 5, 5);
+  ctx.fillRect(28, 4, 6, 7);
+  ctx.fillRect(35, 5, 7, 6);
+  ctx.fillRect(41, 8, 4, 4);
+
+  // Bangs
+  ctx.fillRect(21, 19, 4, 4);
+  ctx.fillRect(27, 19, 5, 5);
+  ctx.fillRect(33, 19, 4, 4);
+  ctx.fillRect(39, 19, 4, 5);
+
+  // Sunlit highlight streaks
+  ctx.fillStyle = '#92400e';
+  ctx.fillRect(22, 8, 4, 3);
+  ctx.fillRect(29, 6, 5, 3);
+  ctx.fillRect(36, 7, 5, 3);
+  ctx.fillStyle = '#d97706';
+  ctx.fillRect(23, 9, 2, 1);
+  ctx.fillRect(30, 7, 3, 1);
+  ctx.fillRect(37, 8, 3, 1);
+}
+
+function drawFemalePortrait(ctx) {
+  // 1. Dark violet vignette background with magenta cyber aura
+  ctx.fillStyle = '#150826';
+  ctx.fillRect(0, 0, 64, 64);
+
+  const bgGrad = ctx.createRadialGradient(32, 28, 2, 32, 28, 28);
+  bgGrad.addColorStop(0, 'rgba(236, 72, 153, 0.35)');
+  bgGrad.addColorStop(0.6, 'rgba(147, 51, 234, 0.16)');
+  bgGrad.addColorStop(1, 'rgba(21, 8, 38, 0)');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, 64, 64);
+
+  // Scanline texture
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+  for (let y = 0; y < 64; y += 2) {
+    ctx.fillRect(0, y, 64, 1);
+  }
+
+  // 2. High Ponytail flowing behind head
+  ctx.fillStyle = '#3b0764';
+  ctx.fillRect(8, 14, 10, 22);
+  ctx.fillRect(6, 20, 8, 24);
+  ctx.fillStyle = '#7e22ce';
+  ctx.fillRect(9, 15, 8, 20);
+  ctx.fillRect(7, 21, 6, 22);
+  ctx.fillStyle = '#a855f7';
+  ctx.fillRect(10, 18, 4, 14);
+  ctx.fillRect(8, 26, 3, 14);
+  ctx.fillStyle = '#e879f9';
+  ctx.fillRect(11, 22, 2, 8);
+
+  // 3. Cyberpunk Bomber Jacket & Shoulders
+  ctx.fillStyle = '#3b0764';
+  ctx.fillRect(6, 48, 52, 16);
+  ctx.fillStyle = '#7e22ce';
+  ctx.fillRect(8, 46, 48, 18);
+  ctx.fillStyle = '#9333ea';
+  ctx.fillRect(10, 48, 44, 16);
+
+  // Popped neon-pink collar
+  ctx.fillStyle = '#db2777';
+  ctx.fillRect(16, 42, 8, 8);
+  ctx.fillRect(40, 42, 8, 8);
+  ctx.fillStyle = '#ec4899';
+  ctx.fillRect(17, 43, 6, 6);
+  ctx.fillRect(41, 43, 6, 6);
+
+  // Dark tech undershirt
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(24, 46, 16, 18);
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(26, 48, 12, 16);
+
+  // Glowing Cyan Power Core
+  ctx.fillStyle = '#0891b2';
+  ctx.fillRect(29, 52, 6, 6);
+  ctx.fillStyle = '#06b6d4';
+  ctx.fillRect(30, 53, 4, 4);
+  ctx.fillStyle = '#cffafe';
+  ctx.fillRect(31, 54, 2, 2);
+
+  // 4. Slender Neck & Soft Chin
+  ctx.fillStyle = '#ea580c';
+  ctx.fillRect(27, 39, 10, 6);
+  ctx.fillStyle = '#fba97b';
+  ctx.fillRect(28, 38, 8, 6);
+
+  // 5. Face Base
+  ctx.fillStyle = '#fba97b';
+  ctx.fillRect(23, 38, 18, 3);
+  ctx.fillStyle = '#fed7aa';
+  ctx.fillRect(21, 20, 22, 19);
+  ctx.fillRect(25, 39, 14, 2);
+  ctx.fillRect(28, 41, 8, 1);
+
+  // Ears
+  ctx.fillStyle = '#fba97b';
+  ctx.fillRect(43, 27, 3, 7);
+  ctx.fillStyle = '#fed7aa';
+  ctx.fillRect(43, 28, 2, 5);
+
+  // 6. Facial Features
+  // Cute Pink Blush
+  ctx.fillStyle = 'rgba(244, 114, 182, 0.45)';
+  ctx.fillRect(23, 32, 5, 3);
+  ctx.fillRect(36, 32, 5, 3);
+  ctx.fillStyle = '#f472b6';
+  ctx.fillRect(24, 33, 3, 1);
+  ctx.fillRect(37, 33, 3, 1);
+
+  // Delicate Lips
+  ctx.fillStyle = '#e11d48';
+  ctx.fillRect(30, 36, 4, 2);
+  ctx.fillStyle = '#fda4af';
+  ctx.fillRect(31, 36, 2, 1);
+
+  // Nose
+  ctx.fillStyle = '#fba97b';
+  ctx.fillRect(32, 31, 1, 3);
+
+  // Expressive Anime Cyber Turquoise Eyes
+  // Left Eye (Black lash + wing)
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(23, 24, 8, 2);
+  ctx.fillRect(22, 24, 2, 1);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(24, 26, 6, 4);
+  ctx.fillStyle = '#06b6d4';
+  ctx.fillRect(25, 26, 4, 4);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(26, 27, 2, 3);
+  // Double Specular Glints
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(25, 26, 1, 2);
+  ctx.fillRect(26, 26, 1, 1);
+  ctx.fillStyle = '#a5f3fc';
+  ctx.fillRect(27, 28, 1, 1);
+
+  // Right Eye (Black lash + wing)
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(33, 24, 8, 2);
+  ctx.fillRect(40, 24, 2, 1);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(34, 26, 6, 4);
+  ctx.fillStyle = '#06b6d4';
+  ctx.fillRect(35, 26, 4, 4);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(36, 27, 2, 3);
+  // Double Specular Glints
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(35, 26, 1, 2);
+  ctx.fillRect(36, 26, 1, 1);
+  ctx.fillStyle = '#a5f3fc';
+  ctx.fillRect(37, 28, 1, 1);
+
+  // Eyebrows
+  ctx.fillStyle = '#581c87';
+  ctx.fillRect(24, 23, 6, 1);
+  ctx.fillRect(34, 23, 6, 1);
+
+  // 7. Layered Violet Anime Hair & Bangs
+  ctx.fillStyle = '#3b0764';
+  ctx.fillRect(19, 10, 26, 11);
+  ctx.fillRect(19, 21, 4, 8);
+  ctx.fillRect(41, 21, 4, 8);
+
+  ctx.fillStyle = '#7e22ce';
+  ctx.fillRect(20, 10, 24, 10);
+  ctx.fillStyle = '#9333ea';
+  ctx.fillRect(21, 11, 22, 8);
+
+  // Sweeping Bangs
+  ctx.fillRect(21, 18, 4, 6);
+  ctx.fillRect(26, 18, 6, 4);
+  ctx.fillRect(33, 18, 5, 5);
+  ctx.fillRect(39, 18, 4, 6);
+  // Lavender highlights
+  ctx.fillStyle = '#c084fc';
+  ctx.fillRect(22, 12, 6, 3);
+  ctx.fillRect(32, 12, 7, 3);
+  ctx.fillStyle = '#e879f9';
+  ctx.fillRect(24, 13, 3, 1);
+  ctx.fillRect(34, 13, 4, 1);
+
+  // 8. Glowing Cyber Barrette / Headset Clip
+  ctx.fillStyle = '#0891b2';
+  ctx.fillRect(18, 15, 4, 6);
+  ctx.fillStyle = '#06b6d4';
+  ctx.fillRect(19, 16, 2, 4);
+  ctx.fillStyle = '#cffafe';
+  ctx.fillRect(19, 17, 2, 2);
+}
+
+// React component for crisp retro pixel-art dialogue avatar
+const PixelAvatar = ({ hero, size = 54 }) => {
+  const avatarCanvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = avatarCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, 64, 64);
+    if (hero === 'male') {
+      drawMalePortrait(ctx);
+    } else {
+      drawFemalePortrait(ctx);
+    }
+  }, [hero]);
+
+  return (
+    <canvas
+      ref={avatarCanvasRef}
+      width={64}
+      height={64}
+      className="pixel-avatar-canvas"
+      style={{ width: `${size}px`, height: `${size}px` }}
+      aria-label={`${hero === 'male' ? 'Aditya' : 'Maya'} pixel art avatar`}
+    />
+  );
+};
+
 const TakeABreakGame = ({ onNavigate }) => {
   const canvasRef = useRef(null);
 
@@ -1592,27 +1986,10 @@ const TakeABreakGame = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* Quest Dialogue Banner with Dynamic Custom Pixel Avatar */}
+          {/* Quest Dialogue Banner with High-Definition Custom Pixel Avatar */}
           <div className="quest-dialogue-card">
             <div className={`dialogue-avatar-box ${selectedHero}`}>
-              {selectedHero === 'male' ? (
-                <div className="pixel-portrait male-portrait">
-                  <div className="portrait-hair male-hair"></div>
-                  <div className="portrait-face">
-                    <div className="portrait-eye"></div>
-                  </div>
-                  <div className="portrait-body male-hoodie"></div>
-                </div>
-              ) : (
-                <div className="pixel-portrait female-portrait">
-                  <div className="portrait-hair female-hair"></div>
-                  <div className="portrait-face">
-                    <div className="portrait-eye cyan-glint"></div>
-                    <div className="portrait-blush"></div>
-                  </div>
-                  <div className="portrait-body female-jacket"></div>
-                </div>
-              )}
+              <PixelAvatar hero={selectedHero} size={54} />
             </div>
             <div className="dialogue-content">
               <div className="dialogue-header">
