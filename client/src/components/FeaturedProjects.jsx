@@ -34,6 +34,7 @@ const FeaturedProjects = ({ onSelectProject }) => {
 
   return (
     <section id="projects" className="featured-projects-section">
+      <span id="work" style={{ display: 'block', position: 'relative', top: '-75px', visibility: 'hidden' }}></span>
       <div className="projects-container">
         <div className="projects-header-wrapper">
           <div className="projects-header-left">
