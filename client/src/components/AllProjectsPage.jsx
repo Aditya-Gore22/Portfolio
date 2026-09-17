@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './AllProjectsPage.css';
+import GameLoader from './GameLoader';
 import { apiUrl, resolveImageUrl } from '../utils/api';
 import { useSettings } from '../context/SettingsContext.jsx';
 import { 
@@ -314,10 +315,11 @@ const AllProjectsPage = ({ onSelectProject, onNavigate }) => {
 
           {/* Loading State */}
           {loading && (
-            <div className="projects-loading-state">
-              <div className="cyber-spinner"></div>
-              <p className="loading-text">// RETRIEVING PROJECTS FROM DATABASE...</p>
-            </div>
+            <GameLoader 
+              message="RETRIEVING DATABASE PROJECTS..." 
+              subtitle="Querying mission records, tech tags, and case studies..." 
+              minHeight="380px"
+            />
           )}
 
           {/* Error State */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ProjectDetailPage.css';
+import GameLoader from './GameLoader';
 import { apiUrl, resolveImageUrl } from '../utils/api';
 import { 
   SiReact, 
@@ -110,11 +111,12 @@ const ProjectDetailPage = ({ projectId, onNavigate }) => {
   if (loading) {
     return (
       <div className="project-detail-page">
-        <div className="project-detail-container">
-          <div className="detail-loading-box">
-            <div className="loading-spinner"></div>
-            <p>// LOADING PROJECT DATA FROM BACKEND...</p>
-          </div>
+        <div className="project-detail-container" style={{ padding: '60px 16px' }}>
+          <GameLoader 
+            message="LOADING PROJECT MISSION INTEL..." 
+            subtitle="Fetching project specs, architecture & gallery from MySQL..." 
+            minHeight="420px"
+          />
         </div>
       </div>
     );
