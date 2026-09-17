@@ -12,6 +12,11 @@
   overflow-x: hidden;
 }
 
+/* Mobile Ambient Backdrop - hidden on desktop */
+.all-projects-bg-backdrop {
+  display: none;
+}
+
 /* --------------------------------------------------------------------------
    Hero Section
    -------------------------------------------------------------------------- */
@@ -719,51 +724,196 @@
 }
 
 @media (max-width: 860px) {
-  .all-projects-hero-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 28px;
-  }
-  
-  .hero-left-content {
-    max-width: 100%;
+  .all-projects-bg-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: 
+      linear-gradient(180deg, rgba(10, 14, 26, 0.84) 0%, rgba(10, 14, 26, 0.94) 60%, rgba(10, 14, 26, 0.98) 100%),
+      url('/images/gamer_room_bg.jpg') center top / cover no-repeat;
+    opacity: 0.38;
+    z-index: 0;
+    pointer-events: none;
   }
 
-  .hero-right-quote-card {
-    max-width: 100%;
-  }
-
-  .hero-bg-art {
-    width: 100%;
-    opacity: 0.35;
-  }
-}
-
-@media (max-width: 640px) {
   .all-projects-page {
-    padding-top: 70px;
+    position: relative;
+    background-color: #070a14;
   }
 
   .all-projects-hero {
-    padding: 32px 0 28px;
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .all-projects-main {
+    position: relative;
+    z-index: 1;
+  }
+
+  .all-projects-hero-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 0 16px;
+  }
+  
+  .hero-left-content {
+    flex: none !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+  }
+
+  .hero-right-quote-card {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+  }
+
+  .hero-bg-art {
+    display: none; /* Hide cluttered shelf/robot photo on mobile/tablet */
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile View (Under 640px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .all-projects-page {
+    padding-top: 66px;
+  }
+
+  .all-projects-hero {
+    padding: 16px 0 14px;
+    background: transparent !important;
+  }
+
+  .all-projects-hero-container {
+    padding: 0 16px;
+    gap: 10px;
+  }
+
+  .hero-left-content {
+    flex: none !important;
+    height: auto !important;
+    min-height: unset !important;
+  }
+
+  .hero-tag-prefix {
+    font-size: 0.78rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
   }
 
   .hero-pixel-title {
-    font-size: 1.65rem;
+    font-size: clamp(1.2rem, 5.2vw, 1.45rem);
+    line-height: 1.22;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    text-shadow: 
+      0 0 10px rgba(192, 132, 252, 0.8),
+      0 0 20px rgba(168, 85, 247, 0.5);
   }
 
-  .projects-card-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+  .hero-subtitle {
+    font-size: 0.83rem;
+    line-height: 1.4;
+    color: #94a3b8;
+    margin-bottom: 0;
   }
 
+  /* Compact Sleek Quote Card on Mobile (No empty void) */
+  .hero-right-quote-card {
+    flex: none !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    padding: 11px 14px !important;
+    border-radius: 12px;
+    background: rgba(13, 19, 34, 0.9);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 10px rgba(56, 189, 248, 0.08);
+  }
+
+  .quote-mark {
+    display: none; /* Hide large quotation mark to save vertical space */
+  }
+
+  .quote-text {
+    font-size: 0.84rem;
+    line-height: 1.4;
+    margin-bottom: 5px;
+    color: #f1f5f9;
+  }
+
+  .quote-author-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .quote-author {
+    font-size: 0.76rem;
+    color: #94a3b8;
+  }
+
+  .quote-controller-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Main Area on Mobile */
+  .all-projects-main {
+    padding: 16px 0 50px;
+  }
+
+  .all-projects-container {
+    padding: 0 16px;
+  }
+
+  /* Controls Bar on Mobile */
   .projects-controls-bar {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+    margin-bottom: 20px;
   }
 
   .search-box-wrapper {
     flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .search-icon {
+    left: 12px;
+    font-size: 1rem;
+  }
+
+  .search-input {
+    font-size: 16px; /* Prevents auto-zoom on iOS Safari */
+    padding: 11px 36px 11px 38px;
+    border-radius: 10px;
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .search-input::placeholder {
+    font-size: 0.84rem;
+  }
+
+  .search-clear-btn {
+    right: 8px;
+    width: 28px;
+    height: 28px;
   }
 
   .sort-dropdown-wrapper {
@@ -773,11 +923,155 @@
   .sort-trigger-btn {
     width: 100%;
     justify-content: space-between;
+    padding: 10px 14px;
+    font-size: 0.86rem;
+    border-radius: 10px;
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .sort-menu {
     left: 0;
     right: 0;
     width: 100%;
+    border-radius: 10px;
+  }
+
+  .sort-menu-item {
+    padding: 11px 14px;
+    font-size: 0.86rem;
+  }
+
+  /* Project Cards Grid on Mobile */
+  .projects-card-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .project-grid-card {
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .project-grid-card:active {
+    transform: scale(0.992);
+  }
+
+  .card-image-wrap {
+    height: 175px;
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+  }
+
+  .card-body {
+    padding: 14px 14px 12px;
+  }
+
+  .card-title-row {
+    margin-bottom: 6px;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .card-header-link {
+    font-size: 1.05rem;
+    padding: 4px;
+  }
+
+  .card-description {
+    font-size: 0.83rem;
+    line-height: 1.45;
+    margin-bottom: 10px;
+    -webkit-line-clamp: 2;
+  }
+
+  .card-tags-list {
+    gap: 5px;
+  }
+
+  .tag-pill {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  .card-footer {
+    padding: 10px 14px;
+    background: rgba(10, 15, 28, 0.6);
+  }
+
+  .card-footer-links {
+    gap: 8px;
+  }
+
+  .card-action-link {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: #cbd5e1;
+  }
+
+  .card-action-link.live-link {
+    background: rgba(56, 189, 248, 0.08);
+    border-color: rgba(56, 189, 248, 0.25);
+    color: #38bdf8;
+  }
+
+  .card-detail-arrow {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    color: #94a3b8;
+    font-size: 0.95rem;
+  }
+
+  /* Pagination on Mobile */
+  .pagination-bar {
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .pagination-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 6px;
+    font-size: 0.82rem;
+    border-radius: 7px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Extra Small Devices (Under 380px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 380px) {
+  .hero-pixel-title {
+    font-size: 1.15rem;
+  }
+
+  .card-image-wrap {
+    height: 155px;
+  }
+
+  .card-footer-links {
+    gap: 5px;
+  }
+
+  .card-action-link {
+    padding: 5px 8px;
+    font-size: 0.74rem;
+  }
+
+  .card-action-link .link-icon {
+    font-size: 0.82rem;
   }
 }
