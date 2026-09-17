@@ -2,6 +2,7 @@ import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
+import logger from '../utils/logger.js';
 
 dotenv.config();
 
@@ -40,7 +41,7 @@ export async function initDatabase() {
       await adminConnection.end();
     } catch (dbErr) {
       // For cloud providers (like TiDB or Aiven), database is often pre-created
-      console.log('Database verification note:', dbErr.message);
+      logger.warn('Database verification note', { message: dbErr.message });
     }
 
     // 2. Initialize pool
@@ -58,7 +59,7 @@ export async function initDatabase() {
     }
 
     if (needsMigration) {
-      console.log('Migrating tables to UUID schema...');
+      logger.info('Migrating tables to UUID schema...');
       await pool.query('DROP TABLE IF EXISTS projects');
       await pool.query('DROP TABLE IF EXISTS messages');
       await pool.query('DROP TABLE IF EXISTS achievements');
@@ -199,7 +200,7 @@ export async function initDatabase() {
       const adminEmail = process.env.ADMIN_EMAIL || null;
 
       if (adminUsername && adminPassword) {
-        console.log('Seeding initial admin user from environment variables...');
+        logger.info('Seeding initial admin user from environment variables...');
         const passwordHash = bcrypt.hashSync(adminPassword, 10);
         const adminId = uuidv4();
 
@@ -207,9 +208,9 @@ export async function initDatabase() {
           `INSERT INTO admin_users (id, username, full_name, email, password_hash, role) VALUES (?, ?, ?, ?, ?, ?)`,
           [adminId, adminUsername, adminFullName, adminEmail, passwordHash, 'admin']
         );
-        console.log(`Default admin created: ${adminUsername} (UUID: ${adminId})`);
+        logger.info('Default admin created', { username: adminUsername, uuid: adminId });
       } else {
-        console.log('No ADMIN_USERNAME / ADMIN_PASSWORD configured in .env; skipping initial admin seed.');
+        logger.warn('No ADMIN_USERNAME / ADMIN_PASSWORD configured in .env; skipping initial admin seed.');
       }
     }
 
@@ -235,10 +236,10 @@ export async function initDatabase() {
       }
     }
 
-    console.log('MySQL database connected & UUID schema ready.');
+    logger.info('MySQL database connected & UUID schema ready.');
     return pool;
   } catch (error) {
-    console.error('MySQL database initialization failed:', error);
+    logger.error('MySQL database initialization failed', { message: error.message, stack: error.stack });
     throw error;
   }
 }
