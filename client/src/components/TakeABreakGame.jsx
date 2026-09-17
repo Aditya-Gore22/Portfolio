@@ -549,6 +549,10 @@ const TakeABreakGame = ({ onNavigate }) => {
   const [dialogueText, setDialogueText] = useState("Collect code, gain XP, avoid the bugs, and reach the flag! Can you complete the level?");
   const [gameKey, setGameKey] = useState(0);
 
+  // Shared keys object — written by both keyboard listeners and mobile touch buttons
+  // Stored in a ref so the game loop closure always reads the latest values.
+  const keysRef = useRef({ left: false, right: false, up: false, down: false });
+
   // Use ref to make character selection reactive inside the game loop immediately
   const heroRef = useRef(selectedHero);
   useEffect(() => {
@@ -716,13 +720,8 @@ const TakeABreakGame = ({ onNavigate }) => {
       reached: false
     };
 
-    // Keys Input
-    const keys = {
-      left: false,
-      right: false,
-      up: false,
-      down: false
-    };
+    // Keys Input — backed by keysRef so touch buttons share the same state
+    const keys = keysRef.current;
 
     const onKeyDown = (e) => {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
@@ -754,6 +753,20 @@ const TakeABreakGame = ({ onNavigate }) => {
       if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp' || e.key === ' ') keys.up = false;
       if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') keys.down = false;
     };
+
+    // Jump trigger used by both keyboard (keydown) and the mobile JUMP button (pointerdown)
+    const triggerJump = () => {
+      if (player.grounded || player.jumpsLeft > 0) {
+        player.vy = player.jumpPower;
+        player.grounded = false;
+        player.jumpsLeft--;
+        audio.jump();
+        addParticles(player.x + player.w / 2, player.y + player.h, '#ffffff', 8);
+      }
+    };
+
+    // Expose triggerJump on the canvas element so the JSX touch buttons can call it
+    if (canvas) canvas._triggerJump = triggerJump;
 
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
@@ -1312,7 +1325,7 @@ const TakeABreakGame = ({ onNavigate }) => {
         ctx.font = '13px "Inter", sans-serif';
         ctx.fillStyle = '#94a3b8';
         ctx.shadowBlur = 0;
-        ctx.fillText('Press [P] or click Resume to continue your quest', CW / 2, CH / 2 + 25);
+        ctx.fillText('Press [P] or tap Resume to continue your quest', CW / 2, CH / 2 + 25);
         ctx.restore();
       }
 
@@ -1331,6 +1344,11 @@ const TakeABreakGame = ({ onNavigate }) => {
   }, [gameKey]);
 
   const handleRestart = () => {
+    // Reset shared keys so no buttons remain "stuck" from the previous run
+    keysRef.current.left = false;
+    keysRef.current.right = false;
+    keysRef.current.up = false;
+    keysRef.current.down = false;
     setScore(0);
     setTime(0);
     setFinalTime(0);
@@ -1447,6 +1465,53 @@ const TakeABreakGame = ({ onNavigate }) => {
         {/* CANVAS STAGE */}
         <div className="canvas-container">
           <canvas ref={canvasRef} className="pixel-game-canvas" />
+
+          {/* ── Mobile Touch Controls (hidden on desktop via CSS) ── */}
+          <div className="mobile-controls" aria-label="Mobile game controls">
+            {/* Left cluster: ← ↓ → */}
+            <div className="mobile-dpad">
+              <button
+                type="button"
+                className="dpad-btn dpad-left"
+                aria-label="Move left"
+                onPointerDown={() => { keysRef.current.left = true; }}
+                onPointerUp={() => { keysRef.current.left = false; }}
+                onPointerLeave={() => { keysRef.current.left = false; }}
+              >◀</button>
+              <button
+                type="button"
+                className="dpad-btn dpad-down"
+                aria-label="Duck"
+                onPointerDown={() => { keysRef.current.down = true; }}
+                onPointerUp={() => { keysRef.current.down = false; }}
+                onPointerLeave={() => { keysRef.current.down = false; }}
+              >▼</button>
+              <button
+                type="button"
+                className="dpad-btn dpad-right"
+                aria-label="Move right"
+                onPointerDown={() => { keysRef.current.right = true; }}
+                onPointerUp={() => { keysRef.current.right = false; }}
+                onPointerLeave={() => { keysRef.current.right = false; }}
+              >▶</button>
+            </div>
+
+            {/* Right cluster: JUMP */}
+            <div className="mobile-action-cluster">
+              <button
+                type="button"
+                className="dpad-btn dpad-jump"
+                aria-label="Jump"
+                onPointerDown={() => {
+                  // Trigger the live jump function exposed by the game loop
+                  if (canvasRef.current?._triggerJump) canvasRef.current._triggerJump();
+                  keysRef.current.up = true;
+                }}
+                onPointerUp={() => { keysRef.current.up = false; }}
+                onPointerLeave={() => { keysRef.current.up = false; }}
+              >▲<span className="jump-label">JUMP</span></button>
+            </div>
+          </div>
 
           {/* Victory Overlay Modal */}
           {gameState === 'won' && (
