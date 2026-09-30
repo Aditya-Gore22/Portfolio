@@ -915,49 +915,42 @@ if (typeof window !== 'undefined') {
   };
 
   heroAssets.male.full = loadImg('/images/aditya_character.png');
-  heroAssets.male.head = loadImg('/images/parts/aditya_head.png');
-  heroAssets.male.torso = loadImg('/images/parts/aditya_torso.png');
-  heroAssets.male.armF = loadImg('/images/parts/aditya_arm_f.png');
-  heroAssets.male.armB = loadImg('/images/parts/aditya_arm_b.png');
-  heroAssets.male.legF = loadImg('/images/parts/aditya_leg_f.png');
-  heroAssets.male.legB = loadImg('/images/parts/aditya_leg_b.png');
+  heroAssets.male.trunk = loadImg('/images/parts/aditya_trunk.png?v=4');
+  heroAssets.male.armF = loadImg('/images/parts/aditya_arm_f.png?v=4');
+  heroAssets.male.armB = loadImg('/images/parts/aditya_arm_b.png?v=4');
+  heroAssets.male.legF = loadImg('/images/parts/aditya_leg_f.png?v=4');
+  heroAssets.male.legB = loadImg('/images/parts/aditya_leg_b.png?v=4');
 
   heroAssets.female.full = loadImg('/images/maya_character.png');
-  heroAssets.female.head = loadImg('/images/parts/maya_head.png');
-  heroAssets.female.torso = loadImg('/images/parts/maya_torso.png');
-  heroAssets.female.armF = loadImg('/images/parts/maya_arm_f.png');
-  heroAssets.female.armB = loadImg('/images/parts/maya_arm_b.png');
-  heroAssets.female.legF = loadImg('/images/parts/maya_leg_f.png');
-  heroAssets.female.legB = loadImg('/images/parts/maya_leg_b.png');
+  heroAssets.female.trunk = loadImg('/images/parts/maya_trunk.png?v=4');
+  heroAssets.female.armF = loadImg('/images/parts/maya_arm_f.png?v=4');
+  heroAssets.female.armB = loadImg('/images/parts/maya_arm_b.png?v=4');
+  heroAssets.female.legF = loadImg('/images/parts/maya_leg_f.png?v=4');
+  heroAssets.female.legB = loadImg('/images/parts/maya_leg_b.png?v=4');
 }
 
 const HERO_ANATOMY = {
   male: {
     scale: 60.0 / 185.0,
-    torsoW: 55,
-    torsoH: 55,
-    torsoPivot: [27.5, 27.5],
-    neckPivot: [0, -25],
-    hipLeft: [6, 25],
-    hipRight: [-6, 25],
-    shoulderFront: [8, -18],
-    shoulderBack: [-8, -18],
-
-    headW: 87,
-    headH: 65,
-    headPivot: [43, 62],
+    trunkW: 87,
+    trunkH: 135,
+    trunkPivot: [37, 125],
+    shoulderBack: [-19, -55],
+    shoulderFront: [16, -55],
+    hipRight: [-7, -5],
+    hipLeft: [7, -5],
 
     armFW: 37,
     armFH: 70,
-    armFPivot: [7, 7],
+    armFPivot: [3, 5],
 
     armBW: 25,
     armBH: 60,
-    armBPivot: [18, 6],
+    armBPivot: [18, 5],
 
     legFW: 51,
     legFH: 70,
-    legFPivot: [18, 5],
+    legFPivot: [8, 5],
 
     legBW: 50,
     legBH: 70,
@@ -965,34 +958,29 @@ const HERO_ANATOMY = {
   },
   female: {
     scale: 60.0 / 931.0,
-    torsoW: 235,
-    torsoH: 205,
-    torsoPivot: [117.5, 102.5],
-    neckPivot: [0, -95],
-    hipLeft: [22, 95],
-    hipRight: [-22, 95],
-    shoulderFront: [32, -65],
-    shoulderBack: [-32, -65],
-
-    headW: 376,
-    headH: 330,
-    headPivot: [210, 315],
+    trunkW: 376,
+    trunkH: 550,
+    trunkPivot: [177.5, 530],
+    shoulderBack: [-97.5, -180],
+    shoulderFront: [77.5, -180],
+    hipRight: [-57.5, -5],
+    hipLeft: [57.5, -5],
 
     armFW: 136,
     armFH: 295,
-    armFPivot: [28, 28],
+    armFPivot: [15, 25],
 
     armBW: 120,
     armBH: 255,
-    armBPivot: [92, 28],
+    armBPivot: [80, 25],
 
     legFW: 211,
     legFH: 411,
-    legFPivot: [70, 20],
+    legFPivot: [70, 5],
 
     legBW: 205,
     legBH: 411,
-    legBPivot: [120, 20]
+    legBPivot: [105, 5]
   }
 };
 
@@ -1000,8 +988,7 @@ function arePartsReady(hero) {
   const h = heroAssets[hero];
   return !!(
     h &&
-    h.head?.complete && h.head?.naturalWidth > 0 &&
-    h.torso?.complete && h.torso?.naturalWidth > 0 &&
+    h.trunk?.complete && h.trunk?.naturalWidth > 0 &&
     h.armF?.complete && h.armF?.naturalWidth > 0 &&
     h.armB?.complete && h.armB?.naturalWidth > 0 &&
     h.legF?.complete && h.legF?.naturalWidth > 0 &&
@@ -1058,119 +1045,139 @@ function drawHeroSprite(ctx, p, tick, heroType, addParticles = null) {
   }
 
   const S = anatomy.scale;
+  const spd = Math.abs(p.vx);
 
   // ═════════════════════════════════════════════
   // 1. BIOMECHANICAL KINEMATIC SIMULATION
+  //    (Continuous, cohesive gait without dismemberment)
   // ═════════════════════════════════════════════
-  let torsoTilt = 0;
-  let torsoBobY = 0;
-  let headTilt = 0;
-  let frontLegAngle = 0;
-  let backLegAngle = 0;
-  let frontArmAngle = 0;
-  let backArmAngle = 0;
-  let frontKneeLift = 0;
-  let backKneeLift = 0;
-  let hairSway = 0;
-  let rootY = 0;
+  let tgt_torsoTilt = 0;
+  let tgt_torsoBobY = 0;
+  let tgt_frontLegAngle = 0;
+  let tgt_backLegAngle = 0;
+  let tgt_frontArmAngle = 0;
+  let tgt_backArmAngle = 0;
+  let tgt_rootY = 0;
 
   if (isDucking) {
-    // ── BRAKE & SLIDE (Baseball-Style Ground Skid) ──
-    rootY = 6;
-    torsoTilt = -0.48; // Leaned back into friction slide
-    frontLegAngle = 0.88; // Front leg extended straight forward skimming tarmac
-    backLegAngle = -0.72; // Back leg bent underneath
-    frontArmAngle = 0.82; // Right arm bracing ground deck
-    backArmAngle = -0.58; // Left arm trailing back
-    headTilt = 0.25; // Head leveled forward through the slide
-    hairSway = -14;
+    // ── BRAKE & SLIDE (Low Aerodynamic Ground Skid) ──
+    const slideT = Math.min(1, (p.animFrame % 6.28) / 3.0);
+    const dampedBounce = Math.sin(slideT * 8) * Math.exp(-slideT * 3.5) * 0.8;
+    tgt_rootY = 4 + dampedBounce;
+    tgt_torsoTilt = -0.25 + dampedBounce * 0.04;
+    tgt_frontLegAngle = 0.38;
+    tgt_backLegAngle = -0.30;
+    tgt_frontArmAngle = 0.35;
+    tgt_backArmAngle = -0.28;
+
   } else if (isJumping) {
-    // ── JUMPING KINEMATICS (Hurdle Leap, Apex, Touchdown Descent) ──
-    if (p.vy < -1.5) {
-      // 🚀 RISING: Explosive upward leap! Knees tuck high towards chest
-      torsoTilt = -0.14; // Aerodynamic upward body tilt
-      frontLegAngle = -0.62; // High knee tuck
-      backLegAngle = 0.42;  // Tucked back heel
-      frontKneeLift = -5;
-      backKneeLift = -4;
-      frontArmAngle = -0.58; // Arms raised for balance
-      backArmAngle = 0.46;
-      headTilt = -0.12; // Looking upward
-      hairSway = 4;
-    } else if (p.vy > 1.5) {
-      // 🪂 FALLING: Extending legs downward, arms reaching out to stabilize
-      torsoTilt = 0.08;
-      frontLegAngle = 0.22; // Legs reaching for touchdown
-      backLegAngle = -0.12;
-      frontArmAngle = 0.52; // Arms bracing
-      backArmAngle = 0.42;
-      headTilt = 0.04;
-      hairSway = -8; // Updraft from falling speed
-    } else {
-      // ⛅ APEX: Weightless float transition
-      torsoTilt = -0.02;
-      frontLegAngle = -0.28;
-      backLegAngle = 0.18;
-      frontArmAngle = -0.25;
-      backArmAngle = 0.22;
-      headTilt = -0.04;
-    }
+    // ── JUMPING KINEMATICS (Continuous Velocity-Proportional) ──
+    const vyNorm = Math.max(-1, Math.min(1, p.vy / 10.0));
+    const tuckFactor = Math.max(0, -vyNorm);
+    const tuckCubic = tuckFactor * tuckFactor * (3 - 2 * tuckFactor);
+    const reachFactor = Math.max(0, vyNorm);
+    const reachCubic = reachFactor * reachFactor * (3 - 2 * reachFactor);
+
+    // Torso: athletic tilt back on rise, slight forward lean on fall
+    tgt_torsoTilt = -0.12 * tuckCubic + 0.08 * reachCubic;
+
+    // Legs: athletic tuck on rise, reaching on fall
+    tgt_frontLegAngle = -0.26 * tuckCubic + 0.18 * reachCubic;
+    tgt_backLegAngle = 0.20 * tuckCubic - 0.12 * reachCubic;
+
+    // Arms: athletic balance
+    tgt_frontArmAngle = -0.30 * tuckCubic + 0.22 * reachCubic;
+    tgt_backArmAngle = 0.22 * tuckCubic + 0.18 * reachCubic;
+
   } else if (isRunning) {
-    // ── SPRINTING KINEMATICS (Athletic High-Velocity Run) ──
+    // ── SPRINTING: Natural Stride & Arm Pump ──
     const phase = p.animFrame;
-    torsoTilt = 0.15; // Forward sprint lean (~8.6 degrees)
-    torsoBobY = Math.abs(Math.sin(phase)) * 2.8; // Energetic vertical bob
+    const strideAmp = Math.min(1.0, spd / 9.0);
 
-    // Leg stride with high knee drive and backward kick
-    frontLegAngle = Math.sin(phase) * 0.78;
-    backLegAngle = -Math.sin(phase) * 0.78;
-    frontKneeLift = Math.max(0, -Math.cos(phase)) * 6;
-    backKneeLift = Math.max(0, Math.cos(phase)) * 6;
+    const k = 2.4;
+    const asymLeg = Math.atan(Math.sin(phase) * k) / Math.atan(k);
+    const kneeSnap = Math.max(0, Math.sin(phase)) * Math.sin(phase) * 0.06;
 
-    // Counter-balancing vigorous arm pump
-    frontArmAngle = -Math.sin(phase) * 0.74;
-    backArmAngle = Math.sin(phase) * 0.74;
+    // Natural sprint angles (clean athletic stride, zero scissor tearing)
+    tgt_frontLegAngle = (asymLeg * 0.30 + kneeSnap) * strideAmp;
+    tgt_backLegAngle = (-asymLeg * 0.30 + kneeSnap * 0.4) * strideAmp;
 
-    headTilt = 0.06 + Math.sin(phase) * 0.03;
-    hairSway = -Math.sin(phase) * 8 - 6;
+    // Forward sprint lean
+    tgt_torsoTilt = 0.06 + strideAmp * 0.06;
 
-    // Running footstep dust particles
-    if (addParticles && tick % 10 === 0) {
-      addParticles(p.x - 2, p.y + p.h, 'rgba(148, 163, 184, 0.45)', 2);
-    }
+    // Organic vertical bounce (1.8px)
+    const stanceDip = Math.abs(Math.cos(phase));
+    tgt_torsoBobY = (1 - Math.pow(stanceDip, 0.6)) * 2.0 * strideAmp;
+
+    // Arm counter-swing
+    const armSwing = Math.atan(Math.sin(phase + Math.PI) * k) / Math.atan(k);
+    tgt_frontArmAngle = armSwing * 0.34 * strideAmp;
+    tgt_backArmAngle = -armSwing * 0.34 * strideAmp;
+
   } else if (isWalking) {
-    // ── WALKING KINEMATICS (Natural Stride Cadence) ──
+    // ── WALKING: Gentle Weight-Transfer Stride ──
     const phase = p.animFrame;
-    torsoTilt = 0.04; // Subtle walking lean
-    torsoBobY = Math.abs(Math.sin(phase)) * 1.6;
+    const sinP = Math.sin(phase);
+    const cosP = Math.cos(phase);
+    const walkAmp = Math.min(1.0, spd / 3.0);
 
-    frontLegAngle = Math.sin(phase) * 0.42;
-    backLegAngle = -Math.sin(phase) * 0.42;
-    frontKneeLift = Math.max(0, -Math.cos(phase)) * 3;
-    backKneeLift = Math.max(0, Math.cos(phase)) * 3;
+    const legPendulum = sinP * 0.18;
+    const heelToeRoll = Math.sin(phase * 2) * 0.025;
+    tgt_frontLegAngle = (legPendulum + heelToeRoll) * walkAmp;
+    tgt_backLegAngle = -(legPendulum - heelToeRoll) * walkAmp;
 
-    frontArmAngle = -Math.sin(phase) * 0.36;
-    backArmAngle = Math.sin(phase) * 0.36;
+    tgt_torsoBobY = (1 + cosP) * 0.5 * 1.0 * walkAmp;
+    tgt_torsoTilt = 0.02 * walkAmp;
 
-    headTilt = Math.sin(phase) * 0.02;
-    hairSway = -Math.sin(phase) * 3;
+    tgt_frontArmAngle = -sinP * 0.18 * walkAmp;
+    tgt_backArmAngle = sinP * 0.18 * walkAmp;
+
   } else {
-    // ── IDLE KINEMATICS (Organic Breathing Cycle) ──
-    const breathe = Math.sin(tick * 0.07);
-    torsoBobY = breathe * 0.8;
-    headTilt = breathe * 0.02;
-    frontArmAngle = breathe * 0.03;
-    backArmAngle = -breathe * 0.03;
-    hairSway = Math.sin(tick * 0.05) * 2;
+    // ── IDLE: Organic Breathing ──
+    const breathe = Math.sin(tick * 0.065);
+    tgt_torsoBobY = breathe * 0.6;
+    tgt_frontArmAngle = breathe * 0.02;
+    tgt_backArmAngle = -breathe * 0.02;
+    tgt_torsoTilt = Math.sin(tick * 0.025) * 0.01;
   }
 
-  // ── LANDING IMPACT SQUASH (Organic Touchdown Compression) ──
+  // ── DYNAMIC ACCELERATION LEAN ──
+  const accelLean = (p.accel || 0) * 0.6;
+  tgt_torsoTilt += Math.max(-0.10, Math.min(0.10, accelLean));
+
+  // ── LANDING IMPACT SQUASH ──
   if (p.landingTimer > 0) {
-    torsoBobY += Math.min(3.5, p.landingTimer * 0.6);
+    const impactT = p.landingTimer / 6.0;
+    tgt_torsoBobY += Math.sin(impactT * Math.PI) * 2.5 * impactT;
+    tgt_frontLegAngle += impactT * 0.08;
+    tgt_backLegAngle -= impactT * 0.06;
   }
 
   // ═════════════════════════════════════════════
-  // 2. LAYERED ARTICULATED HIERARCHICAL RENDERING
+  // 2. SMOOTH POSE INTERPOLATION (Exponential Lerp)
+  // ═════════════════════════════════════════════
+  const lerpPosture = 0.20;
+  const lerpCyclic = 0.40;
+  const pose = p.pose;
+
+  pose.torsoTilt += (tgt_torsoTilt - pose.torsoTilt) * lerpPosture;
+  pose.torsoBobY += (tgt_torsoBobY - pose.torsoBobY) * lerpPosture;
+  pose.frontLegAngle += (tgt_frontLegAngle - pose.frontLegAngle) * lerpCyclic;
+  pose.backLegAngle += (tgt_backLegAngle - pose.backLegAngle) * lerpCyclic;
+  pose.frontArmAngle += (tgt_frontArmAngle - pose.frontArmAngle) * lerpCyclic;
+  pose.backArmAngle += (tgt_backArmAngle - pose.backArmAngle) * lerpCyclic;
+  pose.rootY += (tgt_rootY - pose.rootY) * lerpPosture;
+
+  const torsoTilt = pose.torsoTilt;
+  const torsoBobY = pose.torsoBobY;
+  const frontLegAngle = pose.frontLegAngle;
+  const backLegAngle = pose.backLegAngle;
+  const frontArmAngle = pose.frontArmAngle;
+  const backArmAngle = pose.backArmAngle;
+  const rootY = pose.rootY;
+
+  // ═════════════════════════════════════════════
+  // 3. SEAMLESS UNIFIED RENDERING (ZERO GAPS)
   // ═════════════════════════════════════════════
   ctx.save();
 
@@ -1196,11 +1203,30 @@ function drawHeroSprite(ctx, p, tick, heroType, addParticles = null) {
     ctx.restore();
   }
 
-  // Base translation to character pelvic center
-  ctx.translate(0, feetY - 30 + rootY + torsoBobY);
+  // ── ELASTIC SQUASH & STRETCH TRANSFORM ──
+  const sqX = p.squashX !== undefined ? p.squashX : 1.0;
+  const sqY = p.squashY !== undefined ? p.squashY : 1.0;
 
-  // ── 1. BACK ARM (Behind torso) ──
+  // Base translation to character pelvic center + squash/stretch
+  ctx.translate(0, feetY - 20 + rootY + torsoBobY);
+  ctx.scale(sqX, sqY);
+
+  // ── 1. BACK LEG (Behind trunk, attached to back hip) ──
   ctx.save();
+  ctx.translate(anatomy.hipRight[0] * S, anatomy.hipRight[1] * S);
+  ctx.rotate(backLegAngle);
+  ctx.drawImage(
+    assets.legB,
+    -anatomy.legBPivot[0] * S,
+    -anatomy.legBPivot[1] * S,
+    anatomy.legBW * S,
+    anatomy.legBH * S
+  );
+  ctx.restore();
+
+  // ── 2. BACK ARM (Behind trunk, attached to back shoulder on trunk) ──
+  ctx.save();
+  ctx.rotate(torsoTilt);
   ctx.translate(anatomy.shoulderBack[0] * S, anatomy.shoulderBack[1] * S);
   ctx.rotate(backArmAngle);
   ctx.drawImage(
@@ -1212,59 +1238,18 @@ function drawHeroSprite(ctx, p, tick, heroType, addParticles = null) {
   );
   ctx.restore();
 
-  // ── 2. BACK LEG (Behind torso) ──
-  ctx.save();
-  ctx.translate(anatomy.hipRight[0] * S, anatomy.hipRight[1] * S + backKneeLift * S);
-  ctx.rotate(backLegAngle);
-  ctx.drawImage(
-    assets.legB,
-    -anatomy.legBPivot[0] * S,
-    -anatomy.legBPivot[1] * S,
-    anatomy.legBW * S,
-    anatomy.legBH * S
-  );
-  ctx.restore();
-
-  // ── 3. TORSO (Center Core with Tilt) ──
+  // ── 3. UNIFIED TRUNK (Solid Head + Neck + Torso + Hips - ZERO GAPS) ──
   ctx.save();
   ctx.rotate(torsoTilt);
   ctx.drawImage(
-    assets.torso,
-    -anatomy.torsoPivot[0] * S,
-    -anatomy.torsoPivot[1] * S,
-    anatomy.torsoW * S,
-    anatomy.torsoH * S
+    assets.trunk,
+    -anatomy.trunkPivot[0] * S,
+    -anatomy.trunkPivot[1] * S,
+    anatomy.trunkW * S,
+    anatomy.trunkH * S
   );
 
-  // ── 4. HEAD & HAIR (Attached to Neck on Torso) ──
-  ctx.save();
-  ctx.translate(anatomy.neckPivot[0] * S, anatomy.neckPivot[1] * S);
-  ctx.rotate(headTilt + (hairSway * 0.01));
-  ctx.drawImage(
-    assets.head,
-    -anatomy.headPivot[0] * S,
-    -anatomy.headPivot[1] * S,
-    anatomy.headW * S,
-    anatomy.headH * S
-  );
-  ctx.restore();
-
-  ctx.restore(); // Restore torso rotation
-
-  // ── 5. FRONT LEG (In front of torso) ──
-  ctx.save();
-  ctx.translate(anatomy.hipLeft[0] * S, anatomy.hipLeft[1] * S + frontKneeLift * S);
-  ctx.rotate(frontLegAngle);
-  ctx.drawImage(
-    assets.legF,
-    -anatomy.legFPivot[0] * S,
-    -anatomy.legFPivot[1] * S,
-    anatomy.legFW * S,
-    anatomy.legFH * S
-  );
-  ctx.restore();
-
-  // ── 6. FRONT ARM (In front of torso) ──
+  // ── 4. FRONT ARM (In front of trunk, attached to front shoulder) ──
   ctx.save();
   ctx.translate(anatomy.shoulderFront[0] * S, anatomy.shoulderFront[1] * S);
   ctx.rotate(frontArmAngle);
@@ -1277,225 +1262,239 @@ function drawHeroSprite(ctx, p, tick, heroType, addParticles = null) {
   );
   ctx.restore();
 
+  ctx.restore(); // Restore trunk transform
+
+  // ── 5. FRONT LEG (In front of trunk, attached to front hip) ──
+  ctx.save();
+  ctx.translate(anatomy.hipLeft[0] * S, anatomy.hipLeft[1] * S);
+  ctx.rotate(frontLegAngle);
+  ctx.drawImage(
+    assets.legF,
+    -anatomy.legFPivot[0] * S,
+    -anatomy.legFPivot[1] * S,
+    anatomy.legFW * S,
+    anatomy.legFH * S
+  );
+  ctx.restore();
+
   ctx.restore(); // Restore root translation
 }
 
 // 3. Draw Ultra-Detailed Animated 3D Red Cyber-Bug
 function drawDetailedBug(ctx, bug, tick) {
-  const bx = bug.x;
-  const by = bug.y;
+  const bw = bug.w;
+  const bh = bug.h;
 
   ctx.save();
+  ctx.translate(bug.x + bw / 2, bug.y + bh / 2);
+  ctx.scale(bug.facing, 1);
 
   if (!bug.alive) {
     // Sizzling squashed cyber-bug remnant
-    if (bug.squashedTimer > 0) {
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
-      ctx.beginPath();
-      ctx.ellipse(bx + bug.w / 2, by + bug.h - 3, 21, 5, 0, 0, Math.PI * 2);
-      ctx.fill();
+    const t = bug.squashedTimer;
+    if (t > 0) {
+      const alpha = Math.min(1, t / 10.0);
+      ctx.globalAlpha = alpha;
+      
+      // Crushed scrap metal silhouette on ground
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(-18, 9, 36, 5);
       ctx.fillStyle = '#450a0a';
-      ctx.fillRect(bx + bug.w / 2 - 12, by + bug.h - 6, 24, 3);
-      // Glitch circuit splats
+      ctx.fillRect(-15, 7, 30, 4);
+      ctx.fillStyle = '#991b1b';
+      ctx.fillRect(-11, 6, 22, 3);
+      
+      // Shattered glowing circuit fragments
       ctx.fillStyle = '#ef4444';
-      ctx.fillRect(bx + bug.w / 2 - 16, by + bug.h - 4, 6, 2.5);
-      ctx.fillRect(bx + bug.w / 2 + 10, by + bug.h - 4, 7, 2.5);
-      // Sparks
-      if (tick % 4 < 2) {
+      ctx.fillRect(-16, 8, 5, 2);
+      ctx.fillRect(8, 8, 6, 2);
+      ctx.fillRect(-3, 6, 8, 2);
+
+      // Sizzling electric sparks
+      if (t % 4 < 2) {
         ctx.fillStyle = '#fef08a';
-        ctx.fillRect(bx + bug.w / 2 - 4, by + bug.h - 8, 3, 3);
-        ctx.fillRect(bx + bug.w / 2 + 5, by + bug.h - 9, 2, 2);
+        ctx.fillRect(-8, 3, 3, 3);
+        ctx.fillRect(5, 2, 2.5, 2.5);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-2, 1, 2, 2);
       }
     }
     ctx.restore();
     return;
   }
 
-  // 1. Realistic Ground Contact Drop Shadow
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.52)';
+  // 1. Ground Drop Shadow (Soft dark ellipse on platform)
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
   ctx.beginPath();
-  ctx.ellipse(bx + bug.w / 2, by + bug.h + 2, 19, 5.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 13, 19, 4.5, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // 2. Six Articulated Multi-Segment Mechanical Legs (Authentic Tripod Crawl Gait)
-  const legCycle = Math.sin(bug.legPhase);
-  ctx.strokeStyle = '#450a0a';
-  ctx.lineWidth = 2.4;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+  const phase = bug.legPhase || 0;
+  const crawl1 = Math.sin(phase);
+  const crawl2 = Math.sin(phase + Math.PI * 0.66);
+  const crawl3 = Math.sin(phase + Math.PI * 1.33);
 
-  // Left 3 Legs (Front, Middle, Rear)
-  // Front Left Leg
+  // 2. BACKGROUND LEGS (3 legs in dark shadow behind the body)
+  ctx.strokeStyle = '#1e0505';
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = 'square';
+  ctx.lineJoin = 'miter';
+
+  // Back-rear leg
   ctx.beginPath();
-  ctx.moveTo(bx + 9, by + 13);
-  ctx.lineTo(bx - 3, by + 5 + legCycle * 4.5);
-  ctx.lineTo(bx - 10, by + 18 + legCycle * 4.5);
-  ctx.stroke();
-  // Middle Left Leg
-  ctx.beginPath();
-  ctx.moveTo(bx + 11, by + 18);
-  ctx.lineTo(bx - 6, by + 18 - legCycle * 4.5);
-  ctx.lineTo(bx - 13, by + 28 - legCycle * 4.5);
-  ctx.stroke();
-  // Rear Left Leg
-  ctx.beginPath();
-  ctx.moveTo(bx + 13, by + 23);
-  ctx.lineTo(bx - 4, by + 26 + legCycle * 4.5);
-  ctx.lineTo(bx - 9, by + 32 + legCycle * 4.5);
+  ctx.moveTo(-11, 2);
+  ctx.lineTo(-17, -3 - crawl1 * 3);
+  ctx.lineTo(-21 - crawl1 * 3, 13);
   ctx.stroke();
 
-  // Right 3 Legs (Front, Middle, Rear)
-  // Front Right Leg
+  // Back-middle leg
   ctx.beginPath();
-  ctx.moveTo(bx + bug.w - 9, by + 13);
-  ctx.lineTo(bx + bug.w + 3, by + 5 - legCycle * 4.5);
-  ctx.lineTo(bx + bug.w + 10, by + 18 - legCycle * 4.5);
-  ctx.stroke();
-  // Middle Right Leg
-  ctx.beginPath();
-  ctx.moveTo(bx + bug.w - 11, by + 18);
-  ctx.lineTo(bx + bug.w + 6, by + 18 + legCycle * 4.5);
-  ctx.lineTo(bx + bug.w + 13, by + 28 + legCycle * 4.5);
-  ctx.stroke();
-  // Rear Right Leg
-  ctx.beginPath();
-  ctx.moveTo(bx + bug.w - 13, by + 23);
-  ctx.lineTo(bx + bug.w + 4, by + 26 - legCycle * 4.5);
-  ctx.lineTo(bx + bug.w + 9, by + 32 - legCycle * 4.5);
+  ctx.moveTo(-2, 3);
+  ctx.lineTo(-4, -4 - crawl2 * 3);
+  ctx.lineTo(-5 - crawl2 * 3, 13);
   ctx.stroke();
 
-  // Metallic Joint Nodes on Legs
-  ctx.fillStyle = '#ef4444';
-  ctx.fillRect(bx - 4, by + 4 + legCycle * 4.5, 2.5, 2.5);
-  ctx.fillRect(bx + bug.w + 1.5, by + 4 - legCycle * 4.5, 2.5, 2.5);
-
-  // 3. 3D Domed Ruby Chitin Shell with Radial Depth
-  const shellGrad = ctx.createRadialGradient(
-    bx + bug.w / 2 - 4, by + bug.h / 2 - 5, 2,
-    bx + bug.w / 2, by + bug.h / 2, 17
-  );
-  shellGrad.addColorStop(0, '#fca5a5');
-  shellGrad.addColorStop(0.25, '#ef4444');
-  shellGrad.addColorStop(0.65, '#b91c1c');
-  shellGrad.addColorStop(0.9, '#7f1d1d');
-  shellGrad.addColorStop(1, '#3b0707');
-
-  ctx.fillStyle = shellGrad;
+  // Back-front leg
   ctx.beginPath();
-  ctx.arc(bx + bug.w / 2, by + bug.h / 2, 16, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Armor Carapace Division Seam (Elytra Wing Divider)
-  ctx.strokeStyle = '#280404';
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.moveTo(bx + bug.w / 2, by + 6);
-  ctx.lineTo(bx + bug.w / 2, by + bug.h - 4);
+  ctx.moveTo(8, 3);
+  ctx.lineTo(13, -3 - crawl3 * 3);
+  ctx.lineTo(17 - crawl3 * 3, 13);
   ctx.stroke();
 
-  // Pulsing Cyber Glitch Fissures across Carapace
-  const pulseGlitch = Math.sin(tick * 0.18 + bug.id) * 0.4 + 0.6;
-  ctx.strokeStyle = `rgba(254, 205, 211, ${pulseGlitch})`;
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  ctx.moveTo(bx + bug.w / 2 - 8, by + 14);
-  ctx.lineTo(bx + bug.w / 2 - 3, by + 18);
-  ctx.lineTo(bx + bug.w / 2 - 7, by + 23);
-  ctx.moveTo(bx + bug.w / 2 + 8, by + 14);
-  ctx.lineTo(bx + bug.w / 2 + 3, by + 18);
-  ctx.lineTo(bx + bug.w / 2 + 7, by + 23);
-  ctx.stroke();
-
-  // Specular Gloss Highlight Sheen (Gives spherical 3D volume)
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.68)';
-  ctx.beginPath();
-  ctx.ellipse(bx + bug.w / 2 - 5, by + bug.h / 2 - 7, 7, 3.2, -0.4, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 4. Head Shield & Snapping Mandibles
-  ctx.fillStyle = '#1c0303'; // Head capsule
-  ctx.fillRect(bx + bug.w / 2 - 7, by + 18, 14, 8);
-  
-  // Animated Snapping Mandible Pincers
-  const mandibleSnap = Math.abs(Math.sin(tick * 0.15)) * 2.5;
-  ctx.fillStyle = '#ef4444';
-  ctx.beginPath();
-  // Left Pincer
-  ctx.moveTo(bx + 11 - mandibleSnap, by + 21);
-  ctx.lineTo(bx + 7 - mandibleSnap, by + 28);
-  ctx.lineTo(bx + 13 - mandibleSnap, by + 25);
-  ctx.fill();
-  // Right Pincer
-  ctx.beginPath();
-  ctx.moveTo(bx + bug.w - 11 + mandibleSnap, by + 21);
-  ctx.lineTo(bx + bug.w - 7 + mandibleSnap, by + 28);
-  ctx.lineTo(bx + bug.w - 13 + mandibleSnap, by + 25);
-  ctx.fill();
-
-  // Venomous Sharp Fangs
-  ctx.fillStyle = '#fef08a';
-  ctx.beginPath();
-  ctx.moveTo(bx + 15, by + 21);
-  ctx.lineTo(bx + 17, by + 27);
-  ctx.lineTo(bx + 18, by + 21);
-  ctx.moveTo(bx + 22, by + 21);
-  ctx.lineTo(bx + 23, by + 27);
-  ctx.lineTo(bx + 25, by + 21);
-  ctx.fill();
-
-  // 5. Angry Glowing Compound Insect Eyes
-  // Left Eye (White sclera base)
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.moveTo(bx + 9, by + 8);
-  ctx.lineTo(bx + 17, by + 12);
-  ctx.lineTo(bx + 11, by + 17);
-  ctx.closePath();
-  ctx.fill();
-  // Right Eye
-  ctx.beginPath();
-  ctx.moveTo(bx + bug.w - 9, by + 8);
-  ctx.lineTo(bx + bug.w - 17, by + 12);
-  ctx.lineTo(bx + bug.w - 11, by + 17);
-  ctx.closePath();
-  ctx.fill();
-
-  // Glowing evil pupil cores
+  // 3. ABDOMEN & CHASSIS HULL (Side-View Profile)
+  // Rear Exhaust Heat Vent
   ctx.fillStyle = '#0f172a';
-  ctx.fillRect(bx + 12, by + 11, 3.5, 4);
-  ctx.fillRect(bx + bug.w - 15.5, by + 11, 3.5, 4);
-  // Red optic laser glint
+  ctx.fillRect(-19, 1, 4, 6);
+  ctx.fillStyle = '#ef4444';
+  if (tick % 6 < 3) {
+    ctx.fillRect(-22, 2, 3, 4); // Micro exhaust plasma flicker
+  }
+
+  // Heavy Dark Armor Base Frame
+  ctx.fillStyle = '#1c0404';
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(-16, -7, 28, 16, [6, 4, 3, 5]);
+    ctx.fill();
+  } else {
+    ctx.fillRect(-16, -7, 28, 16);
+  }
+
+  // Segmented Chitin Armor Plates (Crimson / Ruby red gradient)
+  // Rear Carapace Plate
+  ctx.fillStyle = '#991b1b';
+  ctx.fillRect(-15, -6, 10, 14);
+  ctx.fillStyle = '#dc2626'; // Plate highlight
+  ctx.fillRect(-14, -5, 8, 3);
+  ctx.fillStyle = '#7f1d1d'; // Bottom shade
+  ctx.fillRect(-15, 3, 10, 4);
+
+  // Carapace Armor Seam Divider
+  ctx.fillStyle = '#1c0404';
+  ctx.fillRect(-5, -6, 2, 14);
+
+  // Forward Thorax Plate
+  ctx.fillStyle = '#b91c1c';
+  ctx.fillRect(-3, -6, 14, 14);
+  ctx.fillStyle = '#ef4444'; // Top highlight
+  ctx.fillRect(-2, -5, 12, 3);
+  ctx.fillStyle = '#7f1d1d';
+  ctx.fillRect(-3, 3, 14, 4);
+
+  // Glowing Cyber Matrix Circuit Lines (Pulsing Energy Core)
+  const pulseCore = Math.sin(tick * 0.2 + (bug.id || 0)) * 0.35 + 0.65;
+  ctx.fillStyle = `rgba(254, 240, 138, ${pulseCore})`;
+  ctx.fillRect(-12, -1, 5, 2);
+  ctx.fillRect(-2, -1, 8, 2);
+  ctx.fillStyle = `rgba(239, 68, 68, ${pulseCore})`;
+  ctx.fillRect(-9, 1, 2, 3);
+  ctx.fillRect(2, 1, 2, 3);
+
+  // 4. PREDATORY ARMORED HEAD (Front / Right side)
+  ctx.fillStyle = '#1c0404';
+  ctx.fillRect(11, -5, 8, 12);
+  ctx.fillStyle = '#450a0a';
+  ctx.fillRect(12, -4, 6, 10);
+
+  // Hostile Cyber-Optic Scanner Visor (Glowing Neon Red / Pink Glare)
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(16, -2, 2, 4);
   ctx.fillStyle = '#ef4444';
   ctx.shadowColor = '#ef4444';
-  ctx.shadowBlur = 6;
-  ctx.fillRect(bx + 13, by + 12, 1.8, 2.5);
-  ctx.fillRect(bx + bug.w - 14.8, by + 12, 1.8, 2.5);
+  ctx.shadowBlur = 8;
+  ctx.fillRect(14, -3, 4, 6);
   ctx.shadowBlur = 0;
 
-  // 6. Twitching Segmented Antennae with Pulsing Warning Orbs
-  const antennaTwitch = Math.sin(tick * 0.25 + bug.id) * 3;
-  ctx.strokeStyle = '#ef4444';
-  ctx.lineWidth = 1.8;
-  // Left antenna
+  // Snapping Mechanical Mandibles (Pincers extending forward)
+  const snap = Math.abs(Math.sin(tick * 0.18 + (bug.id || 0))) * 3.5;
+  ctx.fillStyle = '#dc2626';
+  // Upper mandible
   ctx.beginPath();
-  ctx.moveTo(bx + 11, by + 5);
-  ctx.quadraticCurveTo(bx + 3, by - 3, bx + 1 + antennaTwitch, by - 10);
-  ctx.stroke();
-  // Right antenna
-  ctx.beginPath();
-  ctx.moveTo(bx + bug.w - 11, by + 5);
-  ctx.quadraticCurveTo(bx + bug.w - 3, by - 3, bx + bug.w - 1 - antennaTwitch, by - 10);
-  ctx.stroke();
-
-  // Glowing Plasma Antenna Tips
-  ctx.fillStyle = '#fde047';
-  ctx.shadowColor = '#fde047';
-  ctx.shadowBlur = 9;
-  ctx.beginPath();
-  ctx.arc(bx + 1 + antennaTwitch, by - 10, 3, 0, Math.PI * 2);
-  ctx.arc(bx + bug.w - 1 - antennaTwitch, by - 10, 3, 0, Math.PI * 2);
+  ctx.moveTo(17, -2);
+  ctx.lineTo(23, -4 - snap);
+  ctx.lineTo(20, -1);
+  ctx.closePath();
   ctx.fill();
+  // Lower mandible
+  ctx.beginPath();
+  ctx.moveTo(17, 3);
+  ctx.lineTo(23, 5 + snap);
+  ctx.lineTo(20, 2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Fangs
+  ctx.fillStyle = '#fef08a';
+  ctx.fillRect(21, -3 - snap, 2, 2);
+  ctx.fillRect(21, 3 + snap, 2, 2);
+
+  // 5. TWITCHING SENSOR ANTENNAE
+  const antTwitch = Math.sin(tick * 0.28 + (bug.id || 0)) * 2.5;
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(15, -4);
+  ctx.lineTo(19 + antTwitch, -12);
+  ctx.lineTo(24 + antTwitch * 1.5, -16);
+  ctx.stroke();
+
+  // Glowing Plasma Sensor Tip
+  ctx.fillStyle = '#fef08a';
+  ctx.shadowColor = '#fde047';
+  ctx.shadowBlur = 6;
+  ctx.fillRect(23 + antTwitch * 1.5, -17, 3, 3);
   ctx.shadowBlur = 0;
+
+  // 6. FOREGROUND LEGS (3 bright foreground legs with metallic knee joints)
+  ctx.strokeStyle = '#7f1d1d';
+  ctx.lineWidth = 2.4;
+
+  // Front-rear leg
+  ctx.beginPath();
+  ctx.moveTo(-10, 4);
+  ctx.lineTo(-14, 0 + crawl1 * 3.5);
+  ctx.lineTo(-17 + crawl1 * 4, 13);
+  ctx.stroke();
+  ctx.fillStyle = '#f87171';
+  ctx.fillRect(-15, -1 + crawl1 * 3.5, 2.5, 2.5); // Metallic knee rivet
+
+  // Front-middle leg
+  ctx.beginPath();
+  ctx.moveTo(-1, 5);
+  ctx.lineTo(0, 0 + crawl2 * 3.5);
+  ctx.lineTo(1 + crawl2 * 4, 13);
+  ctx.stroke();
+  ctx.fillStyle = '#f87171';
+  ctx.fillRect(-1, -1 + crawl2 * 3.5, 2.5, 2.5);
+
+  // Front-front leg
+  ctx.beginPath();
+  ctx.moveTo(8, 5);
+  ctx.lineTo(13, 0 + crawl3 * 3.5);
+  ctx.lineTo(17 + crawl3 * 4, 13);
+  ctx.stroke();
+  ctx.fillStyle = '#f87171';
+  ctx.fillRect(12, -1 + crawl3 * 3.5, 2.5, 2.5);
 
   ctx.restore();
 }
@@ -2426,6 +2425,8 @@ const TakeABreakGame = ({ onNavigate }) => {
       h: 58,
       vx: 0,
       vy: 0,
+      targetVx: 0,       // Smooth acceleration target
+      accel: 0,           // Current smoothed acceleration (dvx/dt)
       speed: 4.8,
       jumpPower: -12.6,
       gravity: 0.62,
@@ -2433,10 +2434,28 @@ const TakeABreakGame = ({ onNavigate }) => {
       jumpsLeft: 2,
       isDucking: false,
       isBraking: false,
-      facing: 1, // 1 right, -1 left
+      facing: 1,
       invulnerable: 0,
       animFrame: 0,
-      landingTimer: 0
+      landingTimer: 0,
+      coyoteTimer: 0,     // Grace frames after leaving ledge
+      jumpBufferTimer: 0, // Pre-land jump input buffer
+      lastStepPhase: 0,   // For detecting foot-strike events
+      squashX: 1.0,       // Elastic squash/stretch horizontal
+      squashY: 1.0,       // Elastic squash/stretch vertical
+      pose: {             // Interpolated pose state for smooth blending
+        torsoTilt: 0,
+        torsoBobY: 0,
+        headTilt: 0,
+        frontLegAngle: 0,
+        backLegAngle: 0,
+        frontArmAngle: 0,
+        backArmAngle: 0,
+        frontKneeLift: 0,
+        backKneeLift: 0,
+        hairSway: 0,
+        rootY: 0
+      }
     };
 
     // Platforms & Entities
@@ -2622,13 +2641,8 @@ const TakeABreakGame = ({ onNavigate }) => {
       if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') keys.right = true;
       if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp' || e.key === ' ') {
         if (!keys.up) {
-          if (player.grounded || player.jumpsLeft > 0) {
-            player.vy = player.jumpPower;
-            player.grounded = false;
-            player.jumpsLeft--;
-            audio.jump();
-            addParticles(player.x + player.w / 2, player.y + player.h, '#ffffff', 8);
-          }
+          // Set jump buffer - actual jump resolved in physics step
+          player.jumpBufferTimer = 6;
         }
         keys.up = true;
       }
@@ -2645,15 +2659,26 @@ const TakeABreakGame = ({ onNavigate }) => {
       if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') keys.down = false;
     };
 
-    // Jump trigger used by keyboard and mobile JUMP button
-    const triggerJump = () => {
-      if (player.grounded || player.jumpsLeft > 0) {
+    // Resolve jump (coyote time + jump buffer aware)
+    const resolveJump = () => {
+      const canJump = player.grounded || player.coyoteTimer > 0 || player.jumpsLeft > 0;
+      if (canJump) {
         player.vy = player.jumpPower;
         player.grounded = false;
+        player.coyoteTimer = 0;
         player.jumpsLeft--;
+        player.jumpBufferTimer = 0;
+        // Takeoff squash & stretch
+        player.squashX = 0.92;
+        player.squashY = 1.08;
         audio.jump();
         addParticles(player.x + player.w / 2, player.y + player.h, '#ffffff', 8);
       }
+    };
+
+    // Jump trigger used by mobile JUMP button
+    const triggerJump = () => {
+      player.jumpBufferTimer = 6;
     };
 
     if (canvas) canvas._triggerJump = triggerJump;
@@ -2760,17 +2785,22 @@ const TakeABreakGame = ({ onNavigate }) => {
         player.isBraking = keys.down;
 
         // Dynamic Hitbox: Ducking / Braking reduces height from 58 to 32
-        // Allows sliding under flying drone bugs (placed at y=340) on ground (y=395)!
         player.h = player.isDucking ? 32 : 58;
 
         const speedTier = Math.min(4.2, (currentDist / 350) * 0.8);
         const baseRunSpeed = 5.0 + speedTier + (turboTimer > 0 ? 3.4 : 0);
 
+        // ── SMOOTH ACCELERATION & INERTIA ──
+        // Compute target velocity based on input, then lerp toward it
+        const groundAccelRate = 0.14;  // Responsive ground acceleration
+        const brakeRate = 0.20;         // Rapid brake friction
+        const airAccelRate = 0.04;      // Conserve momentum in air
+        const accelRate = player.grounded ? (keys.down ? brakeRate : groundAccelRate) : airAccelRate;
+
         if (keys.down) {
           // BRAKE & SLIDE!
-          player.vx = 1.3; // Rapid brake deceleration
+          player.targetVx = 1.3;
           player.facing = 1;
-          player.animFrame += 0.15;
 
           if (player.grounded) {
             // Brake skid sparks
@@ -2785,30 +2815,72 @@ const TakeABreakGame = ({ onNavigate }) => {
           }
         } else if (keys.right) {
           // Sprint Boost Forward
-          player.vx = baseRunSpeed + 2.5;
+          player.targetVx = baseRunSpeed + 2.5;
           player.facing = 1;
-          player.animFrame += 0.38 + (turboTimer > 0 ? 0.08 : 0);
         } else if (keys.left) {
-          // Decelerate / Backpedal (Walking Pace)
-          player.vx = Math.max(0.8, baseRunSpeed - 2.8);
+          // Decelerate / Backpedal
+          player.targetVx = Math.max(0.8, baseRunSpeed - 2.8);
           player.facing = 1;
-          player.animFrame += 0.18;
         } else {
           // Natural Endless Runner Propulsion
-          player.vx = baseRunSpeed;
+          player.targetVx = baseRunSpeed;
           player.facing = 1;
-          player.animFrame += (baseRunSpeed >= 4.5 ? 0.32 : 0.22) + (turboTimer > 0 ? 0.08 : 0);
         }
 
+        // Smooth lerp vx toward targetVx
+        const prevVx = player.vx;
+        player.vx += (player.targetVx - player.vx) * accelRate;
+        player.accel = player.vx - prevVx; // Track acceleration for posture lean
+
+        // ── SYNCHRONIZED STRIDE CADENCE (No Foot Skating) ──
+        // Increment animFrame proportional to actual ground speed
+        if (player.grounded) {
+          player.animFrame += player.vx / 14.0;
+        } else {
+          player.animFrame += Math.abs(player.vx) / 35.0; // Slow limb drift in air
+        }
         if (player.animFrame > 6283) player.animFrame -= 6283.1853;
+
+        // ── FOOTSTEP GROUND STRIKE DETECTION ──
+        if (player.grounded && Math.abs(player.vx) > 1.0) {
+          const currentStepPhase = Math.sin(player.animFrame);
+          const prevStepPhase = Math.sin(player.lastStepPhase);
+          // Foot strikes when sine phase crosses zero (downward crossing = foot contact)
+          if (prevStepPhase > 0 && currentStepPhase <= 0) {
+            if (addParticles) {
+              addParticles(player.x + player.w / 2, player.y + player.h, 'rgba(148, 163, 184, 0.4)', 2);
+            }
+            if (Math.abs(player.vx) > 4.0) {
+              audio.footstep();
+            }
+          }
+        }
+        player.lastStepPhase = player.animFrame;
+
+        // ── VARIABLE JUMP HEIGHT ──
+        // Release jump early for short hops: apply gravity damping when rising and button released
+        if (player.vy < 0 && !keys.up) {
+          player.vy += player.gravity * 0.55; // Extra pull-down for variable height
+        }
+
+        // ── APEX HANG-TIME (Floaty Peak) ──
+        // Reduce gravity near the apex for athletic feel
+        let effectiveGravity = player.gravity;
+        if (!player.grounded && Math.abs(player.vy) < 1.8) {
+          effectiveGravity *= 0.65; // 35% reduced gravity at apex
+        }
 
         // Fast Fall Stomp when in air and pressing down
         if (keys.down && !player.grounded) {
           player.vy += 0.9;
         }
 
-        // Apply Gravity
-        player.vy += player.gravity;
+        // Apply Gravity with apex float
+        player.vy += effectiveGravity;
+
+        // ── TERMINAL VELOCITY CAP ──
+        if (player.vy > 13.5) player.vy = 13.5;
+
         player.x += player.vx;
         player.y += player.vy;
 
@@ -2821,8 +2893,10 @@ const TakeABreakGame = ({ onNavigate }) => {
           player.x = cameraX + 8;
         }
 
-        // 2. Collision with Platforms
+        // ── COYOTE TIME (Grace period after leaving ledge) ──
         const wasGrounded = player.grounded;
+
+        // 2. Collision with Platforms
         player.grounded = false;
         platforms.forEach(plat => {
           if (
@@ -2839,14 +2913,37 @@ const TakeABreakGame = ({ onNavigate }) => {
           }
         });
 
-        // Landing Impact Shockwave & Squash Transition
+        // Coyote timer: start counting grace frames when leaving ground (not jumping)
+        if (wasGrounded && !player.grounded && player.vy >= 0) {
+          player.coyoteTimer = 6; // ~100ms grace period
+        } else if (player.grounded) {
+          player.coyoteTimer = 0;
+        } else if (player.coyoteTimer > 0) {
+          player.coyoteTimer--;
+        }
+
+        // ── JUMP BUFFER RESOLUTION ──
+        if (player.jumpBufferTimer > 0) {
+          player.jumpBufferTimer--;
+          resolveJump();
+        }
+
+        // Landing Impact Shockwave & Elastic Squash
         if (!wasGrounded && player.grounded) {
           player.landingTimer = 6;
+          // Elastic landing squash (compress vertically, expand horizontally)
+          player.squashX = 1.12;
+          player.squashY = 0.86;
           addParticles(player.x + player.w / 2, player.y + player.h, '#cbd5e1', 5);
         }
         if (player.landingTimer > 0) {
           player.landingTimer--;
         }
+
+        // ── ELASTIC SQUASH & STRETCH SPRING-BACK ──
+        // Smoothly spring back to neutral (1.0, 1.0)
+        player.squashX += (1.0 - player.squashX) * 0.18;
+        player.squashY += (1.0 - player.squashY) * 0.18;
 
         // 3. Pit Fall Detection
         if (player.y > CH + 50) {
