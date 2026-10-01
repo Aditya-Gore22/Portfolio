@@ -907,6 +907,24 @@ const heroAssets = {
   }
 };
 
+const bugAssets = {
+  idle: null,
+  walk: [],
+  attack: null,
+  hit: null,
+  death1: null,
+  death2: null,
+  jump: null,
+  fall: null,
+  land: null,
+  dash: null,
+  attackEffect: null,
+  hitEffect: null,
+  deathEffect: null,
+  portrait: null,
+  hq: null
+};
+
 if (typeof window !== 'undefined') {
   const loadImg = (src) => {
     const img = new Image();
@@ -927,6 +945,27 @@ if (typeof window !== 'undefined') {
   heroAssets.female.armB = loadImg('/images/parts/maya_arm_b.png?v=4');
   heroAssets.female.legF = loadImg('/images/parts/maya_leg_f.png?v=4');
   heroAssets.female.legB = loadImg('/images/parts/maya_leg_b.png?v=4');
+
+  bugAssets.idle = loadImg('/images/cyber_bug/idle.png');
+  bugAssets.walk = [
+    loadImg('/images/cyber_bug/walk_1.png'),
+    loadImg('/images/cyber_bug/walk_2.png'),
+    loadImg('/images/cyber_bug/walk_3.png'),
+    loadImg('/images/cyber_bug/walk_4.png')
+  ];
+  bugAssets.attack = loadImg('/images/cyber_bug/attack.png');
+  bugAssets.hit = loadImg('/images/cyber_bug/hit.png');
+  bugAssets.death1 = loadImg('/images/cyber_bug/death_1.png');
+  bugAssets.death2 = loadImg('/images/cyber_bug/death_2.png');
+  bugAssets.jump = loadImg('/images/cyber_bug/jump.png');
+  bugAssets.fall = loadImg('/images/cyber_bug/fall.png');
+  bugAssets.land = loadImg('/images/cyber_bug/land.png');
+  bugAssets.dash = loadImg('/images/cyber_bug/dash.png');
+  bugAssets.attackEffect = loadImg('/images/cyber_bug/attack_effect.png');
+  bugAssets.hitEffect = loadImg('/images/cyber_bug/hit_effect.png');
+  bugAssets.deathEffect = loadImg('/images/cyber_bug/death_effect.png');
+  bugAssets.portrait = loadImg('/images/cyber_bug/portrait.png');
+  bugAssets.hq = loadImg('/images/cyber_bug/bug_hq.png');
 }
 
 const HERO_ANATOMY = {
@@ -1280,221 +1319,161 @@ function drawHeroSprite(ctx, p, tick, heroType, addParticles = null) {
   ctx.restore(); // Restore root translation
 }
 
-// 3. Draw Ultra-Detailed Animated 3D Red Cyber-Bug
+// 3. Draw Ultra-Realistic Animated Cyber-Bug (from User-Provided Art & Action Spritesheet)
 function drawDetailedBug(ctx, bug, tick) {
   const bw = bug.w;
   const bh = bug.h;
 
   ctx.save();
   ctx.translate(bug.x + bw / 2, bug.y + bh / 2);
-  ctx.scale(bug.facing, 1);
+  // Sprites naturally face RIGHT. Scale with bug.facing so:
+  // facing = 1 -> (1, 1) faces right; facing = -1 -> (-1, 1) faces left!
+  ctx.scale(bug.facing || 1, 1);
 
+  // 1. Realistic Ground Shadow & Dynamic Pulsing Crimson Underglow
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.42)';
+  ctx.beginPath();
+  ctx.ellipse(0, bh / 2 + 1, bw * 0.42, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const isDashing = bug.state === 'dash';
+  const isAttacking = bug.state === 'attack';
+  const glowPulse = isDashing
+    ? Math.sin(tick * 0.4) * 0.2 + 0.65
+    : (isAttacking ? 0.75 : Math.sin(tick * 0.18 + (bug.id || 0)) * 0.12 + 0.35);
+
+  ctx.fillStyle = `rgba(239, 68, 68, ${glowPulse})`;
+  ctx.beginPath();
+  ctx.ellipse(0, bh / 2 + 1, bw * 0.52, 7.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // 2. Dead State: Death 1, Death 2 & Explosive Death Effect Burst
   if (!bug.alive) {
-    // Sizzling squashed cyber-bug remnant
     const t = bug.squashedTimer;
     if (t > 0) {
-      const alpha = Math.min(1, t / 10.0);
+      const alpha = Math.min(1, t / 12.0);
+      ctx.save();
       ctx.globalAlpha = alpha;
-      
-      // Crushed scrap metal silhouette on ground
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(-18, 9, 36, 5);
-      ctx.fillStyle = '#450a0a';
-      ctx.fillRect(-15, 7, 30, 4);
-      ctx.fillStyle = '#991b1b';
-      ctx.fillRect(-11, 6, 22, 3);
-      
-      // Shattered glowing circuit fragments
-      ctx.fillStyle = '#ef4444';
-      ctx.fillRect(-16, 8, 5, 2);
-      ctx.fillRect(8, 8, 6, 2);
-      ctx.fillRect(-3, 6, 8, 2);
 
-      // Sizzling electric sparks
-      if (t % 4 < 2) {
-        ctx.fillStyle = '#fef08a';
-        ctx.fillRect(-8, 3, 3, 3);
-        ctx.fillRect(5, 2, 2.5, 2.5);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(-2, 1, 2, 2);
+      // Draw Death sprite (transitions from death1 to death2)
+      const deathImg = (t > 18 && bugAssets.death1?.complete) ? bugAssets.death1 : bugAssets.death2;
+      if (deathImg && deathImg.complete && deathImg.naturalWidth > 0) {
+        const dw = 62;
+        const dh = 40;
+        ctx.drawImage(deathImg, -dw / 2, -dh / 2 + 3, dw, dh);
       }
+
+      // Draw Death Effect (Fiery explosion & bursting scrap shrapnel)
+      if (bugAssets.deathEffect?.complete && bugAssets.deathEffect.naturalWidth > 0) {
+        const ew = 82;
+        const eh = 54;
+        ctx.shadowColor = '#ef4444';
+        ctx.shadowBlur = 14;
+        ctx.drawImage(bugAssets.deathEffect, -ew / 2, -eh / 2 - 4, ew, eh);
+        ctx.shadowBlur = 0;
+      }
+      ctx.restore();
     }
     ctx.restore();
     return;
   }
 
-  // 1. Ground Drop Shadow (Soft dark ellipse on platform)
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-  ctx.beginPath();
-  ctx.ellipse(0, 13, 19, 4.5, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // 3. Action-Driven Sprite Animations
+  if (isDashing) {
+    // ── DASH / CHARGE ACTION (Crouches low with red motion blur trails) ──
+    if (bugAssets.dash?.complete && bugAssets.dash.naturalWidth > 0) {
+      // Motion blur afterimage ghost
+      ctx.save();
+      ctx.globalAlpha = 0.32;
+      ctx.drawImage(bugAssets.dash, -76, -21, 102, 38);
+      ctx.restore();
 
-  const phase = bug.legPhase || 0;
-  const crawl1 = Math.sin(phase);
-  const crawl2 = Math.sin(phase + Math.PI * 0.66);
-  const crawl3 = Math.sin(phase + Math.PI * 1.33);
+      // Main Dash Sprite (102x38 px)
+      ctx.drawImage(bugAssets.dash, -72, -19, 102, 38);
+    } else {
+      // Fallback
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(-bw / 2, -bh / 2, bw, bh);
+    }
+  } else if (isAttacking) {
+    // ── ATTACK ACTION (Rearing stance + lethal sweeping red crescent slash blade) ──
+    if (bugAssets.attack?.complete && bugAssets.attack.naturalWidth > 0) {
+      const aw = 62;
+      const ah = 44;
+      ctx.drawImage(bugAssets.attack, -aw / 2, -ah / 2 - 2, aw, ah);
+    } else if (bugAssets.idle?.complete && bugAssets.idle.naturalWidth > 0) {
+      ctx.drawImage(bugAssets.idle, -28, -20, 56, 40);
+    }
 
-  // 2. BACKGROUND LEGS (3 legs in dark shadow behind the body)
-  ctx.strokeStyle = '#1e0505';
-  ctx.lineWidth = 2.2;
-  ctx.lineCap = 'square';
-  ctx.lineJoin = 'miter';
-
-  // Back-rear leg
-  ctx.beginPath();
-  ctx.moveTo(-11, 2);
-  ctx.lineTo(-17, -3 - crawl1 * 3);
-  ctx.lineTo(-21 - crawl1 * 3, 13);
-  ctx.stroke();
-
-  // Back-middle leg
-  ctx.beginPath();
-  ctx.moveTo(-2, 3);
-  ctx.lineTo(-4, -4 - crawl2 * 3);
-  ctx.lineTo(-5 - crawl2 * 3, 13);
-  ctx.stroke();
-
-  // Back-front leg
-  ctx.beginPath();
-  ctx.moveTo(8, 3);
-  ctx.lineTo(13, -3 - crawl3 * 3);
-  ctx.lineTo(17 - crawl3 * 3, 13);
-  ctx.stroke();
-
-  // 3. ABDOMEN & CHASSIS HULL (Side-View Profile)
-  // Rear Exhaust Heat Vent
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(-19, 1, 4, 6);
-  ctx.fillStyle = '#ef4444';
-  if (tick % 6 < 3) {
-    ctx.fillRect(-22, 2, 3, 4); // Micro exhaust plasma flicker
-  }
-
-  // Heavy Dark Armor Base Frame
-  ctx.fillStyle = '#1c0404';
-  if (ctx.roundRect) {
-    ctx.beginPath();
-    ctx.roundRect(-16, -7, 28, 16, [6, 4, 3, 5]);
-    ctx.fill();
+    // Lethal Red Crescent Blade Wave (attack_effect.png) sweeping forward!
+    if (bugAssets.attackEffect?.complete && bugAssets.attackEffect.naturalWidth > 0) {
+      ctx.save();
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 16;
+      const slashProgress = Math.min(1, (45 - (bug.attackTimer || 0)) / 15.0);
+      const sx = 14 + slashProgress * 12;
+      const sy = -20;
+      const sw = 68;
+      const sh = 38;
+      ctx.drawImage(bugAssets.attackEffect, sx, sy, sw, sh);
+      ctx.restore();
+    }
+  } else if (bug.state === 'hit') {
+    // ── HIT RECOIL ACTION ──
+    if (bugAssets.hit?.complete && bugAssets.hit.naturalWidth > 0) {
+      const hw = 58;
+      const hh = 44;
+      ctx.drawImage(bugAssets.hit, -hw / 2, -hh / 2, hw, hh);
+    }
+    if (bugAssets.hitEffect?.complete && bugAssets.hitEffect.naturalWidth > 0) {
+      ctx.save();
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 12;
+      ctx.drawImage(bugAssets.hitEffect, -20, -30, 48, 36);
+      ctx.restore();
+    }
   } else {
-    ctx.fillRect(-16, -7, 28, 16);
+    // ── 4-FRAME WALK CYCLE / IDLE ACTION ──
+    const isMoving = Math.abs(bug.vx) > 0.1;
+    let spriteImg = null;
+
+    if (isMoving && bugAssets.walk && bugAssets.walk.length === 4) {
+      const fIdx = Math.floor((bug.walkFrame || 0) % 4);
+      spriteImg = bugAssets.walk[fIdx];
+    }
+
+    if (!spriteImg || !spriteImg.complete || spriteImg.naturalWidth === 0) {
+      spriteImg = bugAssets.idle;
+    }
+
+    if (spriteImg && spriteImg.complete && spriteImg.naturalWidth > 0) {
+      const sw = 56;
+      const sh = 40;
+      const bobY = isMoving ? Math.sin(tick * 0.22 + (bug.id || 0)) * 1.2 : 0;
+      ctx.drawImage(spriteImg, -sw / 2, -sh / 2 + bobY, sw, sh);
+    } else {
+      // Fallback
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(-bw / 2, -bh / 2, bw, bh);
+    }
   }
 
-  // Segmented Chitin Armor Plates (Crimson / Ruby red gradient)
-  // Rear Carapace Plate
-  ctx.fillStyle = '#991b1b';
-  ctx.fillRect(-15, -6, 10, 14);
-  ctx.fillStyle = '#dc2626'; // Plate highlight
-  ctx.fillRect(-14, -5, 8, 3);
-  ctx.fillStyle = '#7f1d1d'; // Bottom shade
-  ctx.fillRect(-15, 3, 10, 4);
-
-  // Carapace Armor Seam Divider
-  ctx.fillStyle = '#1c0404';
-  ctx.fillRect(-5, -6, 2, 14);
-
-  // Forward Thorax Plate
-  ctx.fillStyle = '#b91c1c';
-  ctx.fillRect(-3, -6, 14, 14);
-  ctx.fillStyle = '#ef4444'; // Top highlight
-  ctx.fillRect(-2, -5, 12, 3);
-  ctx.fillStyle = '#7f1d1d';
-  ctx.fillRect(-3, 3, 14, 4);
-
-  // Glowing Cyber Matrix Circuit Lines (Pulsing Energy Core)
-  const pulseCore = Math.sin(tick * 0.2 + (bug.id || 0)) * 0.35 + 0.65;
-  ctx.fillStyle = `rgba(254, 240, 138, ${pulseCore})`;
-  ctx.fillRect(-12, -1, 5, 2);
-  ctx.fillRect(-2, -1, 8, 2);
-  ctx.fillStyle = `rgba(239, 68, 68, ${pulseCore})`;
-  ctx.fillRect(-9, 1, 2, 3);
-  ctx.fillRect(2, 1, 2, 3);
-
-  // 4. PREDATORY ARMORED HEAD (Front / Right side)
-  ctx.fillStyle = '#1c0404';
-  ctx.fillRect(11, -5, 8, 12);
-  ctx.fillStyle = '#450a0a';
-  ctx.fillRect(12, -4, 6, 10);
-
-  // Hostile Cyber-Optic Scanner Visor (Glowing Neon Red / Pink Glare)
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(16, -2, 2, 4);
-  ctx.fillStyle = '#ef4444';
+  // 4. Dynamic Realistic Lighting Enhancements (Pulsing glowing </> code core & eyes)
+  const corePulse = Math.sin(tick * 0.25 + (bug.id || 0)) * 0.35 + 0.65;
+  ctx.save();
   ctx.shadowColor = '#ef4444';
   ctx.shadowBlur = 8;
-  ctx.fillRect(14, -3, 4, 6);
-  ctx.shadowBlur = 0;
-
-  // Snapping Mechanical Mandibles (Pincers extending forward)
-  const snap = Math.abs(Math.sin(tick * 0.18 + (bug.id || 0))) * 3.5;
-  ctx.fillStyle = '#dc2626';
-  // Upper mandible
-  ctx.beginPath();
-  ctx.moveTo(17, -2);
-  ctx.lineTo(23, -4 - snap);
-  ctx.lineTo(20, -1);
-  ctx.closePath();
-  ctx.fill();
-  // Lower mandible
-  ctx.beginPath();
-  ctx.moveTo(17, 3);
-  ctx.lineTo(23, 5 + snap);
-  ctx.lineTo(20, 2);
-  ctx.closePath();
-  ctx.fill();
-
-  // Fangs
-  ctx.fillStyle = '#fef08a';
-  ctx.fillRect(21, -3 - snap, 2, 2);
-  ctx.fillRect(21, 3 + snap, 2, 2);
-
-  // 5. TWITCHING SENSOR ANTENNAE
-  const antTwitch = Math.sin(tick * 0.28 + (bug.id || 0)) * 2.5;
-  ctx.strokeStyle = '#ef4444';
-  ctx.lineWidth = 1.6;
-  ctx.beginPath();
-  ctx.moveTo(15, -4);
-  ctx.lineTo(19 + antTwitch, -12);
-  ctx.lineTo(24 + antTwitch * 1.5, -16);
-  ctx.stroke();
-
-  // Glowing Plasma Sensor Tip
-  ctx.fillStyle = '#fef08a';
-  ctx.shadowColor = '#fde047';
-  ctx.shadowBlur = 6;
-  ctx.fillRect(23 + antTwitch * 1.5, -17, 3, 3);
-  ctx.shadowBlur = 0;
-
-  // 6. FOREGROUND LEGS (3 bright foreground legs with metallic knee joints)
-  ctx.strokeStyle = '#7f1d1d';
-  ctx.lineWidth = 2.4;
-
-  // Front-rear leg
-  ctx.beginPath();
-  ctx.moveTo(-10, 4);
-  ctx.lineTo(-14, 0 + crawl1 * 3.5);
-  ctx.lineTo(-17 + crawl1 * 4, 13);
-  ctx.stroke();
-  ctx.fillStyle = '#f87171';
-  ctx.fillRect(-15, -1 + crawl1 * 3.5, 2.5, 2.5); // Metallic knee rivet
-
-  // Front-middle leg
-  ctx.beginPath();
-  ctx.moveTo(-1, 5);
-  ctx.lineTo(0, 0 + crawl2 * 3.5);
-  ctx.lineTo(1 + crawl2 * 4, 13);
-  ctx.stroke();
-  ctx.fillStyle = '#f87171';
-  ctx.fillRect(-1, -1 + crawl2 * 3.5, 2.5, 2.5);
-
-  // Front-front leg
-  ctx.beginPath();
-  ctx.moveTo(8, 5);
-  ctx.lineTo(13, 0 + crawl3 * 3.5);
-  ctx.lineTo(17 + crawl3 * 4, 13);
-  ctx.stroke();
-  ctx.fillStyle = '#f87171';
-  ctx.fillRect(12, -1 + crawl3 * 3.5, 2.5, 2.5);
+  // Glowing red eye optical glint
+  ctx.fillStyle = `rgba(254, 240, 138, ${corePulse})`;
+  ctx.fillRect(8, -4, 2.5, 2.5);
+  ctx.fillStyle = '#ef4444';
+  ctx.fillRect(13, -2, 2.5, 2.5);
+  // Glowing antenna tip
+  ctx.fillStyle = `rgba(254, 240, 138, ${corePulse})`;
+  ctx.fillRect(-12, -16, 2.5, 2.5);
+  ctx.restore();
 
   ctx.restore();
 }
@@ -2172,19 +2151,19 @@ function drawBillboard(ctx, bbX, bbY) {
   const bbH = 125;
   ctx.save();
 
-  // 1. 3D Steel Truss Support Pillars with Cross-Braces
+  // 1. 3D Steel Truss Support Pillars with Cross-Braces (anchoring deep into city ground)
   ctx.strokeStyle = '#334155';
   ctx.lineWidth = 2.5;
   // Left pillar
-  ctx.strokeRect(bbX + 26, bbY + bbH, 12, 160);
+  ctx.strokeRect(bbX + 26, bbY + bbH, 12, 320);
   ctx.fillStyle = '#1e293b';
-  ctx.fillRect(bbX + 26, bbY + bbH, 12, 160);
+  ctx.fillRect(bbX + 26, bbY + bbH, 12, 320);
   // Right pillar
-  ctx.strokeRect(bbX + bbW - 38, bbY + bbH, 12, 160);
-  ctx.fillRect(bbX + bbW - 38, bbY + bbH, 12, 160);
+  ctx.strokeRect(bbX + bbW - 38, bbY + bbH, 12, 320);
+  ctx.fillRect(bbX + bbW - 38, bbY + bbH, 12, 320);
   // Diagonal cross-bracing
   ctx.beginPath();
-  for (let ly = bbY + bbH; ly < bbY + bbH + 150; ly += 32) {
+  for (let ly = bbY + bbH; ly < bbY + bbH + 300; ly += 32) {
     ctx.moveTo(bbX + 38, ly);
     ctx.lineTo(bbX + bbW - 38, ly + 32);
     ctx.moveTo(bbX + bbW - 38, ly);
@@ -2491,15 +2470,18 @@ const TakeABreakGame = ({ onNavigate }) => {
         bugs.push({
           id: Math.random(),
           x: startX + 260,
-          y: 365,
-          w: 42,
-          h: 30,
+          y: 357,
+          w: 56,
+          h: 38,
           minX: startX + 180,
           maxX: startX + 380,
-          vx: 1.3,
+          baseVx: 1.35,
+          vx: 1.35,
           facing: 1,
           alive: true,
-          legPhase: 0,
+          walkFrame: 0,
+          state: 'walk',
+          attackTimer: 0,
           squashedTimer: 0
         });
       } else if (pattern === 1) {
@@ -2544,15 +2526,18 @@ const TakeABreakGame = ({ onNavigate }) => {
         bugs.push({
           id: Math.random(),
           x: startX + 410,
-          y: 365,
-          w: 42,
-          h: 30,
+          y: 357,
+          w: 56,
+          h: 38,
           minX: startX + 390,
           maxX: startX + 490,
-          vx: 1.1,
+          baseVx: 1.2,
+          vx: 1.2,
           facing: 1,
           alive: true,
-          legPhase: 2,
+          walkFrame: 2,
+          state: 'walk',
+          attackTimer: 0,
           squashedTimer: 0
         });
       } else if (pattern === 4) {
@@ -2573,15 +2558,18 @@ const TakeABreakGame = ({ onNavigate }) => {
         bugs.push({
           id: Math.random(),
           x: startX + 370,
-          y: 365,
-          w: 42,
-          h: 30,
+          y: 357,
+          w: 56,
+          h: 38,
           minX: startX + 320,
           maxX: startX + 480,
+          baseVx: 1.4,
           vx: 1.4,
           facing: 1,
           alive: true,
-          legPhase: 4,
+          walkFrame: 1,
+          state: 'walk',
+          attackTimer: 0,
           squashedTimer: 0
         });
       } else {
@@ -2601,6 +2589,24 @@ const TakeABreakGame = ({ onNavigate }) => {
 
     // Initialize Endless Runner Platforms & Chunks
     platforms = [{ x: -300, y: 395, w: 1500, h: 105, type: 'ground' }];
+    // Early Cyber-Bug on initial runway so the player encounters one quickly
+    bugs.push({
+      id: 999,
+      x: 720,
+      y: 357,
+      w: 56,
+      h: 38,
+      minX: 580,
+      maxX: 920,
+      baseVx: 1.3,
+      vx: 1.3,
+      facing: 1,
+      alive: true,
+      walkFrame: 0,
+      state: 'walk',
+      attackTimer: 0,
+      squashedTimer: 0
+    });
     while (generatedUntilX < 2800) {
       generateNextChunk();
     }
@@ -2972,29 +2978,95 @@ const TakeABreakGame = ({ onNavigate }) => {
           player.invulnerable--;
         }
 
-        // 4. Enemy Bug Patrol & Collision
+        // 4. Enemy Cyber-Bug Patrol, Dash Charge, Slash Attack & Collision
         bugs.forEach(bug => {
           if (!bug.alive) {
             if (bug.squashedTimer > 0) bug.squashedTimer--;
             return;
           }
-          bug.x += bug.vx;
-          bug.legPhase += 0.25;
-          if (bug.x <= bug.minX || bug.x + bug.w >= bug.maxX) {
-            bug.vx = -bug.vx;
-            bug.facing = bug.vx > 0 ? 1 : -1;
+
+          const baseSpeed = bug.baseVx || Math.abs(bug.vx) || 1.3;
+          bug.baseVx = baseSpeed;
+
+          // Aggro Perception: Lock onto player if within proximity
+          const dxToPlayer = (player.x + player.w / 2) - (bug.x + bug.w / 2);
+          const dyToPlayer = Math.abs((player.y + player.h / 2) - (bug.y + bug.h / 2));
+          const distToPlayer = Math.abs(dxToPlayer);
+          const inSight = distToPlayer < 280 && dyToPlayer < 85;
+
+          // Cooldown timers
+          if (bug.attackTimer > 0) bug.attackTimer--;
+
+          if (inSight) {
+            // Face the player
+            bug.facing = dxToPlayer > 0 ? 1 : -1;
+
+            if (distToPlayer <= 95 && (bug.attackTimer || 0) <= 0) {
+              // ── ATTACK ACTION (Rears up and unleashes red crescent slash blade!) ──
+              bug.state = 'attack';
+              bug.attackTimer = 42; // Attack duration & recovery
+              bug.vx = bug.facing * 0.35; // Braces during slash
+              audio.stomp();
+              addParticles(
+                bug.x + (bug.facing > 0 ? bug.w : 0),
+                bug.y + bug.h / 2,
+                '#ef4444',
+                6
+              );
+            } else if (bug.attackTimer > 18) {
+              // Still actively swinging slash blade
+              bug.state = 'attack';
+            } else if (distToPlayer > 90 && distToPlayer <= 260) {
+              // ── DASH / CHARGE ACTION (Crouches low with red motion trails!) ──
+              bug.state = 'dash';
+              bug.vx = bug.facing * (baseSpeed * 2.2); // High speed surge
+              // Emit exhaust friction sparks behind bug
+              if (tick % 3 === 0) {
+                const sparkX = bug.facing > 0 ? bug.x - 8 : bug.x + bug.w + 8;
+                addParticles(sparkX, bug.y + bug.h - 4, Math.random() > 0.5 ? '#ef4444' : '#f59e0b', 2);
+              }
+            } else {
+              bug.state = 'walk';
+              bug.vx = bug.facing * baseSpeed;
+              bug.walkFrame = (bug.walkFrame || 0) + 0.22;
+            }
+          } else {
+            // Calm patrol walk cycle
+            bug.state = 'walk';
+            bug.vx = bug.facing * baseSpeed;
+            bug.walkFrame = (bug.walkFrame || 0) + 0.16;
           }
 
+          // Move along patrol vector
+          bug.x += bug.vx;
+
+          // Patrol boundary bounce
+          if (bug.x <= bug.minX) {
+            bug.x = bug.minX;
+            bug.facing = 1;
+            bug.vx = Math.abs(bug.vx);
+          } else if (bug.x + bug.w >= bug.maxX) {
+            bug.x = bug.maxX - bug.w;
+            bug.facing = -1;
+            bug.vx = -Math.abs(bug.vx);
+          }
+
+          // Check collision with player (accounting for crescent slash range when attacking)
+          const slashReach = bug.state === 'attack' ? 24 : 0;
+          const hitLeft = bug.facing > 0 ? bug.x + 3 : bug.x + 3 - slashReach;
+          const hitRight = bug.facing > 0 ? bug.x + bug.w - 3 + slashReach : bug.x + bug.w - 3;
+
           if (
-            player.x + player.w > bug.x + 3 &&
-            player.x < bug.x + bug.w - 3 &&
-            player.y + player.h > bug.y + 2 &&
+            player.x + player.w > hitLeft &&
+            player.x < hitRight &&
+            player.y + player.h > bug.y + 4 &&
             player.y < bug.y + bug.h
           ) {
             if (turboTimer > 0) {
               // Turbo Smash!
               bug.alive = false;
-              bug.squashedTimer = 25;
+              bug.state = 'death';
+              bug.squashedTimer = 35;
               bugsSquashedCount++;
               currentScore += 150;
               setScore(currentScore);
@@ -3002,23 +3074,25 @@ const TakeABreakGame = ({ onNavigate }) => {
               screenShake = 6;
               addText('+150 TURBO SMASH!', bug.x, bug.y - 15, '#f59e0b');
               addParticles(bug.x + bug.w / 2, bug.y + bug.h / 2, '#f59e0b', 24);
-            } else if (player.vy > 0 && player.y + player.h - player.vy <= bug.y + 14) {
-              // Squashed by Jump
+            } else if (player.vy > 0 && player.y + player.h - player.vy <= bug.y + 16) {
+              // Squashed by Jump from above!
               bug.alive = false;
-              bug.squashedTimer = 30;
+              bug.state = 'death';
+              bug.squashedTimer = 35;
               bugsSquashedCount++;
-              player.vy = -9.5;
+              player.vy = -10.5; // High athletic bounce
               player.jumpsLeft = 1;
               currentScore += 100;
               setScore(currentScore);
               audio.stomp();
-              screenShake = 6;
-              addText('+100 SQUASHED!', bug.x - 10, bug.y - 10, '#ef4444');
-              addParticles(bug.x + bug.w / 2, bug.y + bug.h / 2, '#ef4444', 20);
+              screenShake = 7;
+              addText('+100 CRITICAL BUG FIXED!', bug.x - 10, bug.y - 10, '#ef4444');
+              addParticles(bug.x + bug.w / 2, bug.y + bug.h / 2, '#ef4444', 22);
+              addParticles(bug.x + bug.w / 2, bug.y + bug.h / 2, '#f59e0b', 12);
               setDialogueText(
                 heroRef.current === 'male'
-                  ? "Aditya squashed a critical bug! +100 XP gained."
-                  : "Maya executed bug termination! +100 XP gained."
+                  ? "Aditya executed cyber-bug termination! +100 XP gained."
+                  : "Maya neutralized the critical bug! +100 XP gained."
               );
             } else if (player.invulnerable === 0) {
               if (playerHasShield) {
@@ -3030,18 +3104,18 @@ const TakeABreakGame = ({ onNavigate }) => {
                 player.invulnerable = 60;
                 addText('🛡️ SHIELD BROKEN!', player.x, player.y - 20, '#06b6d4');
                 addParticles(player.x + player.w / 2, player.y + player.h / 2, '#06b6d4', 20);
-                setDialogueText("Firewall Shield absorbed the crash! Keep running!");
+                setDialogueText("Firewall Shield absorbed the slash! Keep running!");
               } else {
                 // Hurt!
                 player.invulnerable = 60;
                 currentLives -= 1;
                 setLives(currentLives);
                 audio.hurt();
-                screenShake = 10;
-                addParticles(player.x + player.w / 2, player.y + player.h / 2, '#ff4444', 12);
+                screenShake = 12;
+                addParticles(player.x + player.w / 2, player.y + player.h / 2, '#ff4444', 16);
                 player.vy = -6;
                 player.vx = -player.facing * 4;
-                setDialogueText("Ouch! A runtime bug struck! Jump on top to squash or BRAKE to avoid.");
+                setDialogueText("Cyber-bug slash hit! Leap high over its crescent blade attack!");
 
                 if (currentLives <= 0) {
                   triggerGameOver();
@@ -3313,18 +3387,65 @@ const TakeABreakGame = ({ onNavigate }) => {
       ctx.fill();
       ctx.restore();
 
-      // Distant Spire Silhouettes
+      const cityFloorY = CH + 40; // 540 (extends well below canvas to anchor all buildings)
+
+      // ── LAYER 0.5: DEEP UNDERCITY HORIZON SMOG & INDUSTRIAL SKYLINE ──
+      // Volumetric cyberpunk smog gradient filling the lower city horizon
+      const smogGrad = ctx.createLinearGradient(0, 300, 0, CH);
+      smogGrad.addColorStop(0, 'rgba(4, 7, 20, 0)');
+      smogGrad.addColorStop(0.35, 'rgba(10, 16, 36, 0.65)');
+      smogGrad.addColorStop(0.7, 'rgba(6, 10, 24, 0.92)');
+      smogGrad.addColorStop(1, '#020409');
+      ctx.fillStyle = smogGrad;
+      ctx.fillRect(0, 300, CW, CH - 300);
+
+      // Distant Industrial Horizon Silhouette (dense lower structures, cooling stacks, antennas)
+      const lowLoopW = 800;
+      const lowOffset = (cameraX * 0.04) % lowLoopW;
+      ctx.fillStyle = '#060a18';
+      for (let lx = -lowOffset - 80; lx < CW + 160; lx += 45) {
+        const seed = Math.abs(Math.sin(lx * 0.13)) * 100;
+        const blockH = 70 + (seed % 60);
+        ctx.fillRect(lx, 420 - blockH, 42, blockH + 120);
+        // Antennas & beacon lights on lower horizon
+        if (seed > 50) {
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(lx + 16, 420 - blockH);
+          ctx.lineTo(lx + 16, 420 - blockH - 16);
+          ctx.stroke();
+          if (tick % 36 < 18) {
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(lx + 15, 420 - blockH - 17, 2.5, 2.5);
+            ctx.fillStyle = '#060a18';
+          }
+        }
+      }
+
+      // Distant Spire Silhouettes (Layer 1 - deep parallax: 0.07)
       for (let offset = -spireOffset - 200; offset < CW + 300; offset += spireLoopW) {
         distantSpires.forEach(s => {
           const sx = offset + s.x;
           if (sx + s.w > -60 && sx < CW + 60) {
             const topY = 410 - s.h;
-            // Spire tower gradient
-            const spireGrad = ctx.createLinearGradient(0, topY, 0, 410);
+            // Spire tower gradient extending continuously down into city floor
+            const spireGrad = ctx.createLinearGradient(0, topY, 0, cityFloorY);
             spireGrad.addColorStop(0, '#0a1226');
-            spireGrad.addColorStop(1, '#050a16');
+            spireGrad.addColorStop(0.5, '#060b18');
+            spireGrad.addColorStop(1, '#020409');
             ctx.fillStyle = spireGrad;
-            ctx.fillRect(sx, topY, s.w, s.h);
+            ctx.fillRect(sx, topY, s.w, cityFloorY - topY);
+
+            // Left & Right subtle edge lines going to ground
+            ctx.strokeStyle = '#111d36';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(sx, topY);
+            ctx.lineTo(sx, cityFloorY);
+            ctx.moveTo(sx + s.w, topY);
+            ctx.lineTo(sx + s.w, cityFloorY);
+            ctx.stroke();
 
             // 3D Angled Spire Crown / Obelisk point
             ctx.beginPath();
@@ -3353,9 +3474,9 @@ const TakeABreakGame = ({ onNavigate }) => {
               ctx.shadowBlur = 0;
             }
 
-            // Distant window grid slits
+            // Distant window grid slits continuing into lower depths
             ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
-            for (let wy = topY + 20; wy < 390; wy += 28) {
+            for (let wy = topY + 20; wy < cityFloorY - 10; wy += 28) {
               ctx.fillRect(sx + 12, wy, s.w - 24, 2);
             }
           }
@@ -3374,6 +3495,7 @@ const TakeABreakGame = ({ onNavigate }) => {
           if (bx + b.w > -70 && bx < CW + 70) {
             const topY = 400 - b.h;
             const d = b.roofDepth || 16;
+            const bBottom = cityFloorY;
 
             // 1. 3D Perspective Rooftop Facet (Isometric angled roof plane)
             ctx.fillStyle = '#16233f'; // Lighter roof surface catching sky glow
@@ -3423,41 +3545,55 @@ const TakeABreakGame = ({ onNavigate }) => {
               }
             }
 
-            // 2. 3D Left Perspective Side Bevel (Shadow Facet)
+            // 2. 3D Left Perspective Side Bevel (Shadow Facet) - EXTENDING STRAIGHT TO GROUND
             ctx.fillStyle = '#060b17'; // Shadowed side
             ctx.beginPath();
             ctx.moveTo(bx - d, topY - d);
             ctx.lineTo(bx, topY);
-            ctx.lineTo(bx, 400);
-            ctx.lineTo(bx - d, 400 - d);
+            ctx.lineTo(bx, bBottom);
+            ctx.lineTo(bx - d, bBottom);
             ctx.closePath();
             ctx.fill();
             ctx.strokeStyle = '#111b33';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(bx - d, topY - d);
+            ctx.lineTo(bx - d, bBottom);
             ctx.stroke();
 
-            // 3. Front Facade (Main Face)
-            const facadeGrad = ctx.createLinearGradient(0, topY, 0, 400);
-            facadeGrad.addColorStop(0, '#0a1226');
-            facadeGrad.addColorStop(1, '#080d1c');
+            // 3. Front Facade (Main Face) - EXTENDING STRAIGHT TO GROUND
+            const facadeH = bBottom - topY;
+            const facadeGrad = ctx.createLinearGradient(0, topY, 0, bBottom);
+            facadeGrad.addColorStop(0, '#0d172e');
+            facadeGrad.addColorStop(0.35, '#091022');
+            facadeGrad.addColorStop(0.7, '#050a16');
+            facadeGrad.addColorStop(1, '#020409');
             ctx.fillStyle = facadeGrad;
-            ctx.fillRect(bx, topY, b.w, b.h);
+            ctx.fillRect(bx, topY, b.w, facadeH);
+
+            // Left, top, and right facade borders (no floating horizontal bottom line!)
             ctx.strokeStyle = '#1e2e50';
             ctx.lineWidth = 1.2;
-            ctx.strokeRect(bx, topY, b.w, b.h);
+            ctx.beginPath();
+            ctx.moveTo(bx, bBottom);
+            ctx.lineTo(bx, topY);
+            ctx.lineTo(bx + b.w, topY);
+            ctx.lineTo(bx + b.w, bBottom);
+            ctx.stroke();
 
-            // Architectural Vertical Mullions (gives physical depth ribbing)
+            // Architectural Vertical Mullions (anchored to ground)
             ctx.strokeStyle = '#141e34';
             ctx.lineWidth = 1;
             for (let mx = bx + 22; mx < bx + b.w - 10; mx += 24) {
               ctx.beginPath();
               ctx.moveTo(mx, topY);
-              ctx.lineTo(mx, 400);
+              ctx.lineTo(mx, bBottom);
               ctx.stroke();
             }
 
-            // 4. 3D Multi-Tone Illuminated Windows
+            // 4. 3D Multi-Tone Illuminated Windows (continuing into lower levels)
             for (let wx = bx + 8; wx < bx + b.w - 10; wx += 16) {
-              for (let wy = topY + 14; wy < 380; wy += 22) {
+              for (let wy = topY + 14; wy < bBottom - 12; wy += 22) {
                 const seed = (wx * 11 + wy * 19) % 17;
                 if (seed > 4) {
                   // Window Inset Frame Shadow
@@ -3465,11 +3601,12 @@ const TakeABreakGame = ({ onNavigate }) => {
                   ctx.fillRect(wx - 1, wy - 1, 10, 13);
 
                   // Glowing Window Glass with Varied Color Tints
+                  const isLower = wy > 390;
                   let winColor;
-                  if (seed === 5 || seed === 6) winColor = 'rgba(254, 240, 138, 0.45)'; // Warm Amber
-                  else if (seed === 7) winColor = 'rgba(244, 114, 182, 0.4)'; // Magenta
-                  else if (seed === 8) winColor = 'rgba(255, 255, 255, 0.55)'; // Crisp White
-                  else winColor = 'rgba(56, 189, 248, 0.35)'; // Cyan
+                  if (seed === 5 || seed === 6) winColor = isLower ? 'rgba(245, 158, 11, 0.3)' : 'rgba(254, 240, 138, 0.45)'; // Amber
+                  else if (seed === 7) winColor = isLower ? 'rgba(217, 70, 239, 0.25)' : 'rgba(244, 114, 182, 0.4)'; // Magenta
+                  else if (seed === 8) winColor = isLower ? 'rgba(203, 213, 225, 0.35)' : 'rgba(255, 255, 255, 0.55)'; // Crisp White
+                  else winColor = isLower ? 'rgba(14, 165, 233, 0.25)' : 'rgba(56, 189, 248, 0.35)'; // Cyan
                   
                   ctx.fillStyle = winColor;
                   ctx.fillRect(wx, wy, 8, 11);
@@ -3480,6 +3617,15 @@ const TakeABreakGame = ({ onNavigate }) => {
                 }
               }
             }
+
+            // Heavy Foundation Plinth Belt at Highway Level (grounds building firmly)
+            ctx.fillStyle = '#070b14';
+            ctx.fillRect(bx, 394, b.w, 12);
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(bx, 394, b.w, 12);
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.3)';
+            ctx.fillRect(bx + 4, 399, b.w - 8, 2);
 
             // 5. 3D Holographic Rooftop Sign
             if (b.sign) {
@@ -3514,6 +3660,19 @@ const TakeABreakGame = ({ onNavigate }) => {
           }
         });
       }
+
+      // Distant Lower City Surface Traffic Streams (speeding vehicle lights in deep street canyons below)
+      const trafficOffset1 = (cameraX * 0.18 + tick * 3.2) % CW;
+      const trafficOffset2 = (cameraX * 0.18 - tick * 2.6) % CW;
+      ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+      for (let tx = -trafficOffset1; tx < CW + 120; tx += 90) {
+        ctx.fillRect(tx, 442, 24, 2);
+      }
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+      for (let tx = trafficOffset2; tx < CW + 120; tx += 105) {
+        ctx.fillRect(tx, 460, 20, 2);
+      }
+
       ctx.restore();
 
       // Billboards Parallax
@@ -3615,25 +3774,39 @@ const TakeABreakGame = ({ onNavigate }) => {
             ctx.fillRect(px - 1.5, plat.y + deckH + curbH + 45, 3, 3);
           }
 
-          // 3. 3D Chasm Canyon Wall Drop-offs (Depths at left & right cliff ends!)
-          // Left Cliff Wall
-          ctx.fillStyle = '#050812';
-          ctx.fillRect(plat.x, plat.y, 4, plat.h);
-          ctx.strokeStyle = '#0284c7';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(plat.x, plat.y);
-          ctx.lineTo(plat.x, plat.y + plat.h);
-          ctx.stroke();
+          // 3. 3D Chasm Canyon Wall Drop-offs & Heavy Bridge Support Pylons Plunging into Depths
+          const pylonH = CH + 60 - plat.y;
+          // Left Cliff Wall & Support Pylon
+          ctx.fillStyle = '#060a17';
+          ctx.fillRect(plat.x, plat.y + deckH, 18, pylonH);
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(plat.x, plat.y + deckH, 18, pylonH);
+          // Left pylon cross girders & hazard LEDs
+          for (let py = plat.y + deckH + 16; py < CH + 50; py += 32) {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(plat.x + 2, py, 14, 4);
+            if (tick % 36 < 18) {
+              ctx.fillStyle = '#ef4444';
+              ctx.fillRect(plat.x + 6, py + 1, 3, 2);
+            }
+          }
 
-          // Right Cliff Wall
-          ctx.fillStyle = '#050812';
-          ctx.fillRect(plat.x + plat.w - 4, plat.y, 4, plat.h);
-          ctx.strokeStyle = '#0284c7';
-          ctx.beginPath();
-          ctx.moveTo(plat.x + plat.w, plat.y);
-          ctx.lineTo(plat.x + plat.w, plat.y + plat.h);
-          ctx.stroke();
+          // Right Cliff Wall & Support Pylon
+          ctx.fillStyle = '#060a17';
+          ctx.fillRect(plat.x + plat.w - 18, plat.y + deckH, 18, pylonH);
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(plat.x + plat.w - 18, plat.y + deckH, 18, pylonH);
+          // Right pylon cross girders & hazard LEDs
+          for (let py = plat.y + deckH + 16; py < CH + 50; py += 32) {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(plat.x + plat.w - 16, py, 14, 4);
+            if (tick % 36 < 18) {
+              ctx.fillStyle = '#ef4444';
+              ctx.fillRect(plat.x + plat.w - 10, py + 1, 3, 2);
+            }
+          }
 
         } else {
           // ── 3D FLOATING CYBER PLATFORM ──
