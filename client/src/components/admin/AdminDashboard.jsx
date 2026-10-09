@@ -53,6 +53,9 @@ const AdminDashboard = ({ onNavigate }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(() => Boolean(localStorage.getItem('portfolio_remembered_email')));
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotStatus, setForgotStatus] = useState({ type: '', message: '', devResetUrl: '' });
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -364,6 +367,51 @@ const AdminDashboard = ({ onNavigate }) => {
       setLoginError('Server connection error. Please make sure the backend is running.');
     } finally {
       setIsLoggingIn(false);
+    }
+  };
+
+  const handleOpenForgotModal = () => {
+    setForgotEmail(loginForm.email || '');
+    setForgotStatus({ type: '', message: '', devResetUrl: '' });
+    setShowForgotModal(true);
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      setForgotStatus({ type: 'error', message: 'Please enter your registered email address.', devResetUrl: '' });
+      return;
+    }
+    try {
+      setForgotLoading(true);
+      setForgotStatus({ type: '', message: '', devResetUrl: '' });
+      const res = await fetch(apiUrl('/api/auth/forgot-password'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail.trim() })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setForgotStatus({
+          type: 'success',
+          message: data.message || 'If that email is registered, a recovery link has been sent.',
+          devResetUrl: data.devResetUrl || ''
+        });
+      } else {
+        setForgotStatus({
+          type: 'error',
+          message: data.message || 'Could not send recovery link. Please try again.',
+          devResetUrl: ''
+        });
+      }
+    } catch (err) {
+      setForgotStatus({
+        type: 'error',
+        message: 'Network error connecting to backend server.',
+        devResetUrl: ''
+      });
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -1020,7 +1068,7 @@ const AdminDashboard = ({ onNavigate }) => {
                   <button 
                     type="button" 
                     className="forgot-pwd-btn"
-                    onClick={() => setShowForgotModal(true)}
+                    onClick={handleOpenForgotModal}
                   >
                     Forgot password?
                   </button>
@@ -1078,22 +1126,118 @@ const AdminDashboard = ({ onNavigate }) => {
               </div>
               <div className="modal-body forgot-modal-body">
                 <div className="forgot-icon-wrap">
-                  <FaShieldAlt />
+                  <FaKey />
                 </div>
-                <p className="forgot-text-main">
-                  For maximum security, this admin dashboard does not expose automated public password resets.
+                <h4 style={{ color: '#ffffff', margin: '0 0 8px 0', fontSize: '1.1rem' }}>
+                  Forgot Your Password?
+                </h4>
+                <p className="forgot-text-main" style={{ marginBottom: '16px' }}>
+                  Enter your registered administrator email address. We'll generate a secure, 15-minute recovery link so only you can reset your password.
                 </p>
-                <div className="forgot-instructions">
-                  <p><strong>To update your password:</strong></p>
-                  <ul>
-                    <li>Log in using your administrator credentials.</li>
-                    <li>Navigate to <strong>Profile &rarr; Change Admin Password</strong> to securely update it in MySQL.</li>
-                    <li>If you have lost your credentials, run a password reset query directly in your local MySQL database.</li>
-                  </ul>
-                </div>
-                <button type="button" className="modal-btn-submit" onClick={() => setShowForgotModal(false)}>
-                  Got it, return to login
-                </button>
+
+                {forgotStatus.message && (
+                  <div
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      marginBottom: '16px',
+                      fontSize: '0.85rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      textAlign: 'left',
+                      background: forgotStatus.type === 'success' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                      border: forgotStatus.type === 'success' ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(239, 68, 68, 0.35)',
+                      color: forgotStatus.type === 'success' ? '#4ade80' : '#fca5a5'
+                    }}
+                  >
+                    <span>{forgotStatus.message}</span>
+                    {forgotStatus.devResetUrl && (
+                      <div style={{ marginTop: '4px' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>
+                          Direct Reset Link (Dev mode / Offline SMTP):
+                        </span>
+                        <a
+                          href={forgotStatus.devResetUrl}
+                          style={{
+                            display: 'inline-block',
+                            background: '#0ea5e9',
+                            color: '#ffffff',
+                            padding: '7px 14px',
+                            borderRadius: '6px',
+                            fontSize: '0.82rem',
+                            textDecoration: 'none',
+                            fontWeight: '600'
+                          }}
+                          onClick={() => setShowForgotModal(false)}
+                        >
+                          🔑 Open Password Reset Page &rarr;
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {forgotStatus.type !== 'success' ? (
+                  <form onSubmit={handleForgotPassword} style={{ width: '100%', textAlign: 'left' }}>
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px', fontWeight: '600' }}>
+                        Administrator Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={e => setForgotEmail(e.target.value)}
+                        placeholder="e.g. adityagore2025@gmail.com"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '10px 14px',
+                          background: '#030b1a',
+                          border: '1.5px solid #1e3a5f',
+                          borderRadius: '8px',
+                          color: '#ffffff',
+                          fontSize: '0.9rem',
+                          outline: 'none',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      className="modal-btn-submit"
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '12px',
+                        cursor: forgotLoading ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      {forgotLoading ? (
+                        <>
+                          <FaSpinner className="spinning" />
+                          <span>Generating Link...</span>
+                        </>
+                      ) : (
+                        <span>Send Recovery Link &rarr;</span>
+                      )}
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    className="modal-btn-submit"
+                    style={{ width: '100%', padding: '12px', marginTop: '8px' }}
+                    onClick={() => setShowForgotModal(false)}
+                  >
+                    Done / Close
+                  </button>
+                )}
               </div>
             </div>
           </div>
