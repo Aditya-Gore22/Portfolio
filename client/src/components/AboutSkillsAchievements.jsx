@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './AboutSkillsAchievements.css';
-import { FaHeart, FaCog, FaTrophy, FaJava, FaProjectDiagram, FaCode, FaPuzzlePiece, FaGraduationCap, FaBook, FaGamepad } from 'react-icons/fa';
+import { FaHeart, FaCog, FaTrophy, FaJava, FaProjectDiagram, FaCode, FaPuzzlePiece, FaGraduationCap, FaBook, FaGamepad, FaLock } from 'react-icons/fa';
 import { SiJavascript, SiReact, SiNodedotjs, SiExpress, SiMysql, SiHtml5, SiCss, SiGit } from 'react-icons/si';
+import { apiUrl } from '../utils/api';
 
 const PixelHeart = () => (
   <svg 
@@ -22,7 +23,97 @@ const PixelHeart = () => (
   </svg>
 );
 
+const DEFAULT_SKILLS = [
+  { name: 'JavaScript', icon: 'SiJavascript', color: '#f7df1e' },
+  { name: 'React', icon: 'SiReact', color: '#61dafb' },
+  { name: 'Node.js', icon: 'SiNodedotjs', color: '#68a063' },
+  { name: 'Express.js', icon: 'SiExpress', color: 'white' },
+  { name: 'MySQL', icon: 'SiMysql', color: '#4479a1' },
+  { name: 'Java', icon: 'FaJava', color: '#f89820' },
+  { name: 'HTML5', icon: 'SiHtml5', color: '#e34f26' },
+  { name: 'CSS3', icon: 'SiCss', color: '#1572b6' },
+  { name: 'Git', icon: 'SiGit', color: '#f05032' },
+  { name: 'DSA', icon: 'FaProjectDiagram', color: '#9333ea' },
+  { name: 'OOP', icon: 'FaCode', color: '#0ea5e9' },
+  { name: 'Problem Solving', icon: 'FaPuzzlePiece', color: '#f59e0b' }
+];
+
+const DEFAULT_ACHIEVEMENTS = [
+  {
+    title: 'MCA Graduate',
+    description: 'Completed Masters in Computer Applications',
+    icon: 'FaGraduationCap'
+  },
+  {
+    title: 'Built 3+ Full Stack Projects',
+    description: 'From idea to deployment',
+    icon: 'FaCode'
+  },
+  {
+    title: 'Continuous Learner',
+    description: 'Always exploring new technologies',
+    icon: 'FaBook'
+  },
+  {
+    title: 'Gamer at Heart',
+    description: 'Believer that games make life better',
+    icon: 'FaGamepad'
+  }
+];
+
+const renderSkillIcon = (iconName, skillName) => {
+  const s = String(skillName || '').toLowerCase();
+  const ic = String(iconName || '').toLowerCase();
+  if (ic.includes('javascript') || s.includes('javascript') || s === 'js') return <SiJavascript color="#f7df1e" size={28} />;
+  if (ic.includes('react') || s.includes('react')) return <SiReact color="#61dafb" size={28} />;
+  if (ic.includes('node') || s.includes('node')) return <SiNodedotjs color="#68a063" size={28} />;
+  if (ic.includes('express') || s.includes('express')) return <SiExpress color="white" size={28} />;
+  if (ic.includes('mysql') || s.includes('mysql') || s.includes('sql')) return <SiMysql color="#4479a1" size={28} />;
+  if (ic.includes('java') && !ic.includes('javascript') || s.includes('java') && !s.includes('javascript')) return <FaJava color="#f89820" size={28} />;
+  if (ic.includes('html') || s.includes('html')) return <SiHtml5 color="#e34f26" size={28} />;
+  if (ic.includes('css') || s.includes('css')) return <SiCss color="#1572b6" size={28} />;
+  if (ic.includes('git') || s.includes('git')) return <SiGit color="#f05032" size={28} />;
+  if (ic.includes('project') || s.includes('dsa') || s.includes('api')) return <FaProjectDiagram color="#9333ea" size={28} />;
+  if (ic.includes('lock') || s.includes('jwt') || s.includes('auth')) return <FaLock color="#ec4899" size={28} />;
+  if (ic.includes('puzzle') || s.includes('problem')) return <FaPuzzlePiece color="#f59e0b" size={28} />;
+  return <FaCode color="#0ea5e9" size={28} />;
+};
+
+const renderAchievementIcon = (iconName, title) => {
+  const t = String(title || '').toLowerCase();
+  const ic = String(iconName || '').toLowerCase();
+  if (ic.includes('grad') || t.includes('mca') || t.includes('graduate') || t.includes('degree')) return <FaGraduationCap />;
+  if (ic.includes('code') || t.includes('project') || t.includes('built')) return <FaCode />;
+  if (ic.includes('book') || t.includes('learn')) return <FaBook />;
+  if (ic.includes('game') || t.includes('gamer')) return <FaGamepad />;
+  return <FaTrophy />;
+};
+
 const AboutSkillsAchievements = () => {
+  const [skills, setSkills] = useState(DEFAULT_SKILLS);
+  const [achievements, setAchievements] = useState(DEFAULT_ACHIEVEMENTS);
+
+  useEffect(() => {
+    // Dynamic fetch from MySQL backend
+    fetch(apiUrl('/api/skills'))
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setSkills(data.data);
+        }
+      })
+      .catch(() => {});
+
+    fetch(apiUrl('/api/achievements'))
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setAchievements(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section id="about" className="asa-section">
       <div className="asa-container">
@@ -82,54 +173,12 @@ const AboutSkillsAchievements = () => {
 
             <div className="asa-skills-body">
               <div className="asa-skills-grid">
-                <div className="asa-skill-item">
-                  <SiJavascript color="#f7df1e" size={28} />
-                  <span>JavaScript</span>
-                </div>
-                <div className="asa-skill-item">
-                  <SiReact color="#61dafb" size={28} />
-                  <span>React</span>
-                </div>
-                <div className="asa-skill-item">
-                  <SiNodedotjs color="#68a063" size={28} />
-                  <span>Node.js</span>
-                </div>
-                <div className="asa-skill-item">
-                  <SiExpress color="white" size={28} />
-                  <span>Express.js</span>
-                </div>
-                <div className="asa-skill-item">
-                  <SiMysql color="#4479a1" size={28} />
-                  <span>MySQL</span>
-                </div>
-                <div className="asa-skill-item">
-                  <FaJava color="#f89820" size={28} />
-                  <span>Java</span>
-                </div>
-                <div className="asa-skill-item">
-                  <SiHtml5 color="#e34f26" size={28} />
-                  <span>HTML5</span>
-                </div>
-                <div className="asa-skill-item">
-                  <SiCss color="#1572b6" size={28} />
-                  <span>CSS3</span>
-                </div>
-                <div className="asa-skill-item">
-                  <SiGit color="#f05032" size={28} />
-                  <span>Git</span>
-                </div>
-                <div className="asa-skill-item">
-                  <FaProjectDiagram color="#9333ea" size={28} />
-                  <span>DSA</span>
-                </div>
-                <div className="asa-skill-item">
-                  <FaCode color="#0ea5e9" size={28} />
-                  <span>OOP</span>
-                </div>
-                <div className="asa-skill-item">
-                  <FaPuzzlePiece color="#f59e0b" size={28} />
-                  <span>Problem Solving</span>
-                </div>
+                {skills.map((skill, index) => (
+                  <div key={skill.id || index} className="asa-skill-item">
+                    {renderSkillIcon(skill.icon, skill.name)}
+                    <span>{skill.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -143,47 +192,22 @@ const AboutSkillsAchievements = () => {
               </div>
               <div className="asa-ach-status">
                 <span className="asa-status-text">UNLOCKED</span>
-                <span className="asa-status-badge">4/4</span>
+                <span className="asa-status-badge">{achievements.length}/4</span>
               </div>
             </div>
 
             <div className="asa-ach-body">
-              <div className="asa-ach-item">
-                <div className="asa-ach-icon">
-                  <FaGraduationCap />
+              {achievements.map((ach, index) => (
+                <div key={ach.id || index} className="asa-ach-item">
+                  <div className="asa-ach-icon">
+                    {renderAchievementIcon(ach.icon, ach.title)}
+                  </div>
+                  <div className="asa-ach-text">
+                    <h4>{ach.title}</h4>
+                    <p>{ach.description || ach.organization || ''}</p>
+                  </div>
                 </div>
-                <div className="asa-ach-text">
-                  <h4>MCA Graduate</h4>
-                  <p>Completed Masters in Computer Applications</p>
-                </div>
-              </div>
-              <div className="asa-ach-item">
-                <div className="asa-ach-icon">
-                  <FaCode />
-                </div>
-                <div className="asa-ach-text">
-                  <h4>Built 3+ Full Stack Projects</h4>
-                  <p>From idea to deployment</p>
-                </div>
-              </div>
-              <div className="asa-ach-item">
-                <div className="asa-ach-icon">
-                  <FaBook />
-                </div>
-                <div className="asa-ach-text">
-                  <h4>Continuous Learner</h4>
-                  <p>Always exploring new technologies</p>
-                </div>
-              </div>
-              <div className="asa-ach-item">
-                <div className="asa-ach-icon">
-                  <FaGamepad />
-                </div>
-                <div className="asa-ach-text">
-                  <h4>Gamer at Heart</h4>
-                  <p>Believer that games make life better</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 

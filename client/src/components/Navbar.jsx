@@ -20,7 +20,7 @@ const Navbar = ({ currentView = 'home', onNavigate }) => {
     { id: 'about', name: 'About', section: 'about' },
     { id: 'projects', name: 'Projects', section: 'projects' },
     { id: 'skills', name: 'Skills', section: 'about' },
-    { id: 'experience', name: 'Experience', section: 'about' },
+    { id: 'experience', name: 'Experience', section: 'experience' },
     { id: 'resume', name: 'Resume', section: 'resume' },
     { id: 'break', name: 'Take a Break', section: 'game' },
     { id: 'contact', name: 'Contact', section: 'contact' },

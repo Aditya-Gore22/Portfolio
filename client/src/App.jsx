@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import FeaturedProjects from './components/FeaturedProjects';
 import AboutSkillsAchievements from './components/AboutSkillsAchievements';
+import Experience from './components/Experience';
 import ContactCTA from './components/ContactCTA';
 import ContactPage from './components/ContactPage';
 import ResumePage from './components/ResumePage';
@@ -163,6 +164,7 @@ function App() {
           <Hero onNavigate={handleNavigate} />
           <FeaturedProjects onSelectProject={handleSelectProject} onNavigate={handleNavigate} />
           <AboutSkillsAchievements />
+          <Experience />
           <ContactCTA onNavigate={handleNavigate} />
         </main>
       )}

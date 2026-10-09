@@ -685,22 +685,29 @@ const AdminDashboard = ({ onNavigate }) => {
   const handleSaveExperience = async (e) => {
     e.preventDefault();
     try {
+      const skillsArray = typeof experienceForm.skills === 'string'
+        ? experienceForm.skills.split(',').map(s => s.trim()).filter(Boolean)
+        : (Array.isArray(experienceForm.skills) ? experienceForm.skills : []);
+
       const res = await authFetch('/api/experiences', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...experienceForm,
-          skills: experienceForm.skills.split(',').map(s => s.trim()).filter(Boolean)
+          skills: skillsArray
         })
       });
       const json = await res.json();
-      if (json.success) {
+      if (res.ok && json.success) {
         setIsAddExperienceModalOpen(false);
         setExperienceForm({ role: '', company: '', period: '2024 - Present', description: '', skills: 'React, Node.js, MySQL' });
         loadDashboardData();
+      } else {
+        alert(json.message || 'Failed to save experience. Please ensure role and company are provided.');
       }
     } catch (err) {
       console.error(err);
+      alert('Error saving experience: ' + err.message);
     }
   };
 
