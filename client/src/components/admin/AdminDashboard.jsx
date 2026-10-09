@@ -230,7 +230,7 @@ const AdminDashboard = ({ onNavigate }) => {
       const [statsRes, projectsRes, messagesRes, visitorsRes, skillsRes, gameRes, healthRes] = await Promise.all([
         fetch(apiUrl('/api/admin/stats')).then(r => r.json()).catch(() => null),
         fetch(apiUrl('/api/projects?all=true')).then(r => r.json()).catch(() => null),
-        fetch(apiUrl('/api/messages')).then(r => r.json()).catch(() => null),
+        authFetch('/api/messages').then(r => r.json()).catch(() => null),
         fetch(apiUrl(`/api/admin/visitors?days=${visitorTimeRange}`)).then(r => r.json()).catch(() => null),
         fetch(apiUrl('/api/skills')).then(r => r.json()).catch(() => null),
         fetch(apiUrl('/api/game/stats')).then(r => r.json()).catch(() => null),
